@@ -31,3 +31,18 @@ replay_pid*
 .AppleDouble
 .LSOverride
 Icon
+
+# Gradle files
+.gradle/
+/build/
+
+# Local configuration file (sdk path, etc)
+local.properties
+
+# Android Studio generated files and folders
+captures/
+.externalNativeBuild/
+.cxx/
+*.aab
+*.apk
+output-metadata.json
