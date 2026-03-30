@@ -1,6 +1,8 @@
 package com.example.neupsipromovil.presentation.common.atoms
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -27,11 +29,13 @@ import androidx.compose.ui.unit.sp
 fun ComunidadAtomo(
     modifier: Modifier = Modifier,
 ) {
-    Box(
+    Column(
         modifier =
             modifier
                 .width(137.dp)
                 .height(64.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Box(
             modifier =
@@ -64,7 +68,6 @@ fun ComunidadAtomo(
             text = "Comunidad",
             modifier =
                 modifier
-                    .padding(top = 42.dp)
                     .fillMaxWidth()
                     .height(16.dp),
             style =
