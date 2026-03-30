@@ -38,6 +38,16 @@ fun ComunidadAtomo(
                     .clip(RoundedCornerShape(16.dp)),
             contentAlignment = Alignment.Center,
         ) {
+            Box(
+                modifier =
+                    modifier
+                        .width(56.dp)
+                        .height(32.dp)
+                        .clip(RoundedCornerShape(16.dp)),
+                contentAlignment = Alignment.Center,
+            ) {
+
+            }
         }
         Text(
             text = "Comunidad",
