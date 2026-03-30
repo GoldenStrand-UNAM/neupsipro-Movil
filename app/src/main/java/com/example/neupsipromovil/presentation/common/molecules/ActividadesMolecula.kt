@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.sp
 import com.example.neupsipromovil.R
 
 @Composable
-fun CuidadoMolecula(
+fun ActividadesMolecula(
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -53,8 +53,8 @@ fun CuidadoMolecula(
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.icono_atomo_cuidado),
-                    contentDescription = "Cuidado",
+                    painter = painterResource(id = R.drawable.icono_atomo_actividades),
+                    contentDescription = "Actividades",
                     modifier =
                         modifier
                             .width(24.dp)
@@ -64,7 +64,7 @@ fun CuidadoMolecula(
             }
         }
         Text(
-            text = "Cuidado",
+            text = "Actividades",
             modifier =
                 modifier
                     .fillMaxWidth()
@@ -85,6 +85,6 @@ fun CuidadoMolecula(
 
 @Preview(showBackground = true)
 @Composable
-fun CuidadoMoleculaPreview() {
-    CuidadoMolecula()
+fun ActividadesMoleculaPreview() {
+    ActividadesMolecula()
 }
