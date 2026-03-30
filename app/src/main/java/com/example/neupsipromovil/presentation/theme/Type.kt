@@ -1,4 +1,4 @@
-package com.example.neupsipromovil.ui.theme
+package com.example.neupsipromovil.presentation.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

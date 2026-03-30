@@ -1,6 +1,5 @@
-package com.example.neupsipromovil.ui.theme
+package com.example.neupsipromovil.presentation.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme

@@ -1,4 +1,4 @@
-package com.example.neupsipromovil.ui.theme
+package com.example.neupsipromovil.presentation.theme
 
 import androidx.compose.ui.graphics.Color
 
