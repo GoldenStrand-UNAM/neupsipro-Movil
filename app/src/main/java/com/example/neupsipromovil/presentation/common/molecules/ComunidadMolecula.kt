@@ -1,4 +1,4 @@
-package com.example.neupsipromovil.presentation.common.atoms
+package com.example.neupsipromovil.presentation.common.molecules
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -53,7 +53,7 @@ fun ComunidadMolecula(
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.iconoAtomoComunidad),
+                    painter = painterResource(id = R.drawable.icono_atomo_comunidad),
                     contentDescription = "Comunidad",
                     modifier =
                         modifier
