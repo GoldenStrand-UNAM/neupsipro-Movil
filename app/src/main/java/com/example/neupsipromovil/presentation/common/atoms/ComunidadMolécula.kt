@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.sp
 import com.example.neupsipromovil.R
 
 @Composable
-fun ComunidadAtomo(
+fun ComunidadMolecula(
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -53,7 +53,7 @@ fun ComunidadAtomo(
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.iconocomunidad),
+                    painter = painterResource(id = R.drawable.iconoAtomoComunidad),
                     contentDescription = "Comunidad",
                     modifier =
                         modifier
@@ -85,6 +85,6 @@ fun ComunidadAtomo(
 
 @Preview(showBackground = true)
 @Composable
-fun ComunidadAtomoPreview() {
-    ComunidadAtomo()
+fun ComunidadMoleculaPreview() {
+    ComunidadMolecula()
 }
