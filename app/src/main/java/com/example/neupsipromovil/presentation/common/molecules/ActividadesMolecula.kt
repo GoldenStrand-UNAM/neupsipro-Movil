@@ -30,9 +30,7 @@ fun ActividadesMolecula(
 ) {
     Column(
         modifier =
-            modifier
-                .width(137.dp)
-                .height(64.dp),
+        modifier,
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {

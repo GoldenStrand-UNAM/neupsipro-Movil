@@ -31,7 +31,6 @@ fun CuidadoMolecula(
     Column(
         modifier =
             modifier
-                .width(137.dp)
                 .height(64.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
