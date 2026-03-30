@@ -36,7 +36,7 @@ fun ActividadesMolecula(
     ) {
         Box(
             modifier =
-                modifier
+                Modifier
                     .width(56.dp)
                     .height(32.dp)
                     .clip(RoundedCornerShape(16.dp)),
@@ -44,7 +44,7 @@ fun ActividadesMolecula(
         ) {
             Box(
                 modifier =
-                    modifier
+                    Modifier
                         .width(56.dp)
                         .height(32.dp)
                         .clip(RoundedCornerShape(16.dp)),
@@ -54,7 +54,7 @@ fun ActividadesMolecula(
                     painter = painterResource(id = R.drawable.icono_atomo_actividades),
                     contentDescription = "Actividades",
                     modifier =
-                        modifier
+                        Modifier
                             .width(24.dp)
                             .height(22.dp),
                     tint = Color.Black,
@@ -64,7 +64,7 @@ fun ActividadesMolecula(
         Text(
             text = "Actividades",
             modifier =
-                modifier
+                Modifier
                     .fillMaxWidth()
                     .height(16.dp),
             style =

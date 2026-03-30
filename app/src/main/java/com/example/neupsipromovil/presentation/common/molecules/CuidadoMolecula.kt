@@ -30,14 +30,13 @@ fun CuidadoMolecula(
 ) {
     Column(
         modifier =
-            modifier
-                .height(64.dp),
+        modifier,
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Box(
             modifier =
-                modifier
+                Modifier
                     .width(56.dp)
                     .height(32.dp)
                     .clip(RoundedCornerShape(16.dp)),
@@ -45,7 +44,7 @@ fun CuidadoMolecula(
         ) {
             Box(
                 modifier =
-                    modifier
+                    Modifier
                         .width(56.dp)
                         .height(32.dp)
                         .clip(RoundedCornerShape(16.dp)),
@@ -55,7 +54,7 @@ fun CuidadoMolecula(
                     painter = painterResource(id = R.drawable.icono_atomo_cuidado),
                     contentDescription = "Cuidado",
                     modifier =
-                        modifier
+                        Modifier
                             .width(24.dp)
                             .height(22.dp),
                     tint = Color.Black,
@@ -65,7 +64,7 @@ fun CuidadoMolecula(
         Text(
             text = "Cuidado",
             modifier =
-                modifier
+                Modifier
                     .fillMaxWidth()
                     .height(16.dp),
             style =

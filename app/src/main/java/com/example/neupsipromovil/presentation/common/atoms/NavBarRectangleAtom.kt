@@ -25,7 +25,6 @@ fun NavBarRectangleAtom(
                 .fillMaxWidth()
                 .height(64.dp)
                 .background(color = Color.White),
-        horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         content()

@@ -1,10 +1,9 @@
+package com.example.neupsipromovil.presentation.common.molecules
+
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.neupsipromovil.presentation.common.atoms.NavBarRectangleAtom
-import com.example.neupsipromovil.presentation.common.molecules.ActividadesMolecula
-import com.example.neupsipromovil.presentation.common.molecules.ComunidadMolecula
-import com.example.neupsipromovil.presentation.common.molecules.CuidadoMolecula
 
 @Composable
 fun NavBarMolecula(
