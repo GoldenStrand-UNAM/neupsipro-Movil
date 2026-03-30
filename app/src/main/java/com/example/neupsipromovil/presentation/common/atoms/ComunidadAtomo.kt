@@ -1,11 +1,14 @@
-import androidx.compose.foundation.gestures.snapping.SnapPosition
+package com.example.neupsipromovil.presentation.common.atoms
+
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -46,7 +49,15 @@ fun ComunidadAtomo(
                         .clip(RoundedCornerShape(16.dp)),
                 contentAlignment = Alignment.Center,
             ) {
-
+                Icon(
+                    imageVector = Icons.Outlined.Home,
+                    contentDescription = "Home",
+                    modifier =
+                        modifier
+                            .width(24.dp)
+                            .height(22.dp),
+                    tint = Color.Black,
+                )
             }
         }
         Text(
