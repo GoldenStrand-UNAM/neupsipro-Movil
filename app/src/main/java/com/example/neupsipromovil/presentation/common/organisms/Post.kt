@@ -21,7 +21,6 @@ fun PostOrganism(
     modifier: Modifier = Modifier,
     username: String = "Username",
     avatarLetter: String = "U",
-    content: @Composable () -> Unit = {},
 ) {
     Column(
         modifier = modifier
@@ -43,7 +42,7 @@ fun PostOrganism(
                 .padding(horizontal = 16.dp)
                 .padding(bottom = 10.dp),
         ) {
-            content()
+
         }
     }
 }
@@ -55,7 +54,5 @@ fun PostOrganismPreview() {
         username = "Username",
         avatarLetter = "U",
     )
-    {
-        Text(text = "BUENOS DIASS")
-    }
+
 }
