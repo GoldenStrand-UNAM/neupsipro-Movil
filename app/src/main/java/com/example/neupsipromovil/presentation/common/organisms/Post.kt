@@ -1,5 +1,6 @@
 package com.example.neupsipromovil.presentation.common.organisms
 
+import android.service.quicksettings.Tile
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,8 +13,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.neupsipromovil.presentation.common.atoms.UsernamePostMolecule
 
 @Composable
@@ -21,6 +24,7 @@ fun PostOrganism(
     modifier: Modifier = Modifier,
     username: String = "Username",
     avatarLetter: String = "U",
+    title: String ="Titulo del Post",
 ) {
     Column(
         modifier = modifier
@@ -34,6 +38,21 @@ fun PostOrganism(
             title = username,
             avatarLetter = avatarLetter,
         )
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .padding(horizontal = 16.dp)
+                .padding(top = 10.dp),
+        ) {
+            Text(
+                text = title,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium,
+                color = Color(0xFF1A1A2E),
+            )
+        }
 
         Column(
             modifier = Modifier
