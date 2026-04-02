@@ -25,6 +25,7 @@ fun PostOrganism(
     username: String = "Username",
     avatarLetter: String = "U",
     title: String ="Titulo del Post",
+    body: String = "Cuerpo del Post",
 ) {
     Column(
         modifier = modifier
@@ -59,9 +60,14 @@ fun PostOrganism(
                 .fillMaxWidth()
                 .wrapContentHeight()
                 .padding(horizontal = 16.dp)
-                .padding(bottom = 10.dp),
+                .padding(top = 10.dp, bottom = 10.dp),
         ) {
-
+            Text(
+                text = body,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Normal,
+                color = Color(0xFF1A1A2E),
+            )
         }
     }
 }
@@ -72,6 +78,8 @@ fun PostOrganismPreview() {
     PostOrganism(
         username = "Username",
         avatarLetter = "U",
+        title ="BUENOS DIASSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+        body = "HOLAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
     )
 
 }
