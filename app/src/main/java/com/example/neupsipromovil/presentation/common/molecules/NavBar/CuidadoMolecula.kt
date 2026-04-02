@@ -1,4 +1,4 @@
-package com.example.neupsipromovil.presentation.common.molecules
+package com.example.neupsipromovil.presentation.common.molecules.NavBar
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.sp
 import com.example.neupsipromovil.R
 
 @Composable
-fun ComunidadMolecula(
+fun CuidadoMolecula(
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -51,8 +51,8 @@ fun ComunidadMolecula(
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.icono_atomo_comunidad),
-                    contentDescription = "Comunidad",
+                    painter = painterResource(id = R.drawable.icono_atomo_cuidado),
+                    contentDescription = "Cuidado",
                     modifier =
                         Modifier
                             .width(24.dp)
@@ -62,7 +62,7 @@ fun ComunidadMolecula(
             }
         }
         Text(
-            text = "Comunidad",
+            text = "Cuidado",
             modifier =
                 Modifier
                     .fillMaxWidth()
@@ -83,6 +83,6 @@ fun ComunidadMolecula(
 
 @Preview(showBackground = true)
 @Composable
-fun ComunidadMoleculaPreview() {
-    ComunidadMolecula()
+fun CuidadoMoleculaPreview() {
+    CuidadoMolecula()
 }
