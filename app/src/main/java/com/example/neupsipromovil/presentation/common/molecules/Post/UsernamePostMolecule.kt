@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun HeaderMolecule(
+fun UsernamePostMolecule(
     modifier: Modifier = Modifier,
     title: String = "Username",
     avatarLetter: String = "U",
@@ -69,5 +69,5 @@ fun HeaderMolecule(
 @Preview(showBackground = true)
 @Composable
 fun PostHeaderPreview() {
-    HeaderMolecule(title = "Username", avatarLetter = "U")
+    UsernamePostMolecule(title = "Username", avatarLetter = "U")
 }
