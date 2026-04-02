@@ -28,12 +28,13 @@ fun PostOrganism(
     body: String = "Cuerpo del Post",
 ) {
     Column(
-        modifier = modifier
-            .width(360.dp)
-            .wrapContentHeight()
-            .clip(RoundedCornerShape(12.dp))
-            .background(Color(0xFFF5F5F5))
-            .padding(vertical = 10.dp),
+        modifier =
+            modifier
+                .width(360.dp)
+                .wrapContentHeight()
+                .clip(RoundedCornerShape(12.dp))
+                .background(Color(0xFFF5F5F5))
+                .padding(vertical = 10.dp),
     ) {
         UsernamePostMolecule(
             title = username,
@@ -41,11 +42,12 @@ fun PostOrganism(
         )
 
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(horizontal = 16.dp)
-                .padding(top = 10.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .padding(horizontal = 16.dp)
+                    .padding(top = 10.dp),
         ) {
             Text(
                 text = title,
@@ -56,11 +58,12 @@ fun PostOrganism(
         }
 
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(horizontal = 16.dp)
-                .padding(top = 10.dp, bottom = 10.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .padding(horizontal = 16.dp)
+                    .padding(top = 10.dp, bottom = 10.dp),
         ) {
             Text(
                 text = body,
@@ -79,7 +82,7 @@ fun PostOrganismPreview() {
         username = "Username",
         avatarLetter = "U",
         title ="BUENOS DIASSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
-        body = "HOLAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+        body = "HOLAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
     )
 
 }
