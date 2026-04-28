@@ -1,4 +1,4 @@
-package com.example.neupsipromovil.presentation.common.molecules.NavBar
+package com.example.neupsipromovil.presentation.common.molecules.navBar
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

@@ -46,3 +46,7 @@ captures/
 *.aab
 *.apk
 output-metadata.json
+
+.idea/
+*.iml
+*.iws

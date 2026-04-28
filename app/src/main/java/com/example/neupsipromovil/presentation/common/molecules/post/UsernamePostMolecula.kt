@@ -1,4 +1,4 @@
-package com.example.neupsipromovil.presentation.common.atoms
+package com.example.neupsipromovil.presentation.common.molecules.post
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
