@@ -12,6 +12,7 @@
 
 # Package Files #
 *.jar
+!gradle/wrapper/gradle-wrapper.jar
 *.war
 *.nar
 *.ear
@@ -55,9 +56,6 @@ output-metadata.json
 node_modules/
 npm-debug.log
 yarn-error.log
-
-# Husky
-.husky/_
 
 .idea/
 *.iml

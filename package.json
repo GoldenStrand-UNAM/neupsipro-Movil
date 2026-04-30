@@ -1,0 +1,27 @@
+{
+  "name": "neupsipro-movil",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GoldenStrand-UNAM/neupsipro-Movil.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/GoldenStrand-UNAM/neupsipro-Movil/issues"
+  },
+  "homepage": "https://github.com/GoldenStrand-UNAM/neupsipro-Movil#readme",
+  "devDependencies": {
+    "@commitlint/cli": "^20.5.3",
+    "@commitlint/config-conventional": "^20.5.3",
+    "husky": "^9.1.7"
+  }
+}

@@ -1,0 +1,3 @@
+node scripts/check-names.js $(git diff --cached --name-only)
+
+cmd.exe /c "gradlew.bat ktlintCheck"
