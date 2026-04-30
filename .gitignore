@@ -34,7 +34,8 @@ Icon
 
 # Gradle files
 .gradle/
-/build/
+build/
+*.iml
 
 # Local configuration file (sdk path, etc)
 local.properties
@@ -47,6 +48,16 @@ captures/
 *.apk
 output-metadata.json
 
+.idea/caches/
+.idea/libraries/
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Husky
+.husky/_
+
 .idea/
 *.iml
-*.iws
