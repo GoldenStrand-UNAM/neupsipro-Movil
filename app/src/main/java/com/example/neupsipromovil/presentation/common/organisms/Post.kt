@@ -1,6 +1,5 @@
 package com.example.neupsipromovil.presentation.common.organisms
 
-import android.service.quicksettings.Tile
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,7 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.neupsipromovil.presentation.common.atoms.UsernamePostMolecule
+import com.example.neupsipromovil.presentation.common.molecules.post.UsernamePostMolecule
 
 @Composable
 fun PostOrganism(
