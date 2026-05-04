@@ -16,11 +16,11 @@ ktlint {
 }
 
 android {
-    namespace = "com.app.arcabyolimpo"
+    namespace = "com.app.neupsipromovil"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.app.arcabyolimpo"
+        applicationId = "com.app.neupsipromovil"
         minSdk = 29
         targetSdk = 36
         versionCode = 1
@@ -99,6 +99,9 @@ dependencies {
 
     //Coil for image loading
     implementation("io.coil-kt:coil-compose:2.5.0")
+
+    //Encrypt token
+    implementation("androidx.security:security-crypto:1.1.0-alpha06")
 
     // Material Pull to refresh
     implementation(libs.androidx.material)
