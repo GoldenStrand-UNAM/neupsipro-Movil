@@ -16,11 +16,11 @@ ktlint {
 }
 
 android {
-    namespace = "com.app.arcabyolimpo"
+    namespace = "com.app.neupsiproMovil"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.app.arcabyolimpo"
+        applicationId = "com.app.neupsiproMovil"
         minSdk = 29
         targetSdk = 36
         versionCode = 1
