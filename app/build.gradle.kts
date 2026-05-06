@@ -16,11 +16,12 @@ ktlint {
 }
 
 android {
-    namespace = "com.app.neupsipromovil"
+    namespace = "com.app.neupsiproMovil"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.app.neupsipromovil"
+        applicationId = "com.app.neupsiproMovil"
+        namespace = "com.app.neupsiproMovil"
         minSdk = 29
         targetSdk = 36
         versionCode = 1
@@ -28,7 +29,6 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-
     buildTypes {
         release {
             isMinifyEnabled = false
