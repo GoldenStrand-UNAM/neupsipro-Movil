@@ -22,7 +22,7 @@ import androidx.compose.ui.text.style.TextAlign.Companion.Center
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.app.arcabyolimpo.R
+import com.app.neupsiproMovil.R
 
 @Composable
 fun CuidadoMolecula(
