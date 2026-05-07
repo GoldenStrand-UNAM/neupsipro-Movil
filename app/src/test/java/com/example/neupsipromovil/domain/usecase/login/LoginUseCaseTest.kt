@@ -120,4 +120,25 @@ class LoginUseCaseTest {
             assertTrue(result.isSuccess)
             assertEquals(fakeLogin, result.getOrNull())
         }
+
+    // ─────────────────────────────────────────────
+    // UC 1.2 — XSS treated as plain string
+    // ─────────────────────────────────────────────
+
+    @Test
+    fun `UC 1-2 XSS script tag is treated as plain text and forwarded`() =
+        runTest {
+            // GIVEN: XSS injection attempt via username field
+            val xssPayload = "<script>alert('xss')</script>"
+            val fakeLogin = Login(username = xssPayload)
+
+            whenever(loginRepository.login(xssPayload, "pass")).thenReturn(
+                Result.success(fakeLogin),
+            )
+
+            val result = loginUseCase(username = xssPayload, password = "pass")
+
+            // THEN: treated as a normal string — no special blocking at UseCase level
+            assertTrue(result.isSuccess)
+        }
 }
