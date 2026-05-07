@@ -34,4 +34,24 @@ class LoginUseCaseTest {
             assertTrue(result.isFailure)
             assertEquals("EMPTY_FIELDS", result.exceptionOrNull()?.message)
         }
+
+    @Test
+    fun `UC 2-1 empty password returns EMPTY_FIELDS failure`() =
+        runTest {
+            // GIVEN: username is valid, password is blank
+            val result = loginUseCase(username = "john", password = "   ")
+
+            // THEN: blank strings (only spaces) are also considered empty
+            assertTrue(result.isFailure)
+            assertEquals("EMPTY_FIELDS", result.exceptionOrNull()?.message)
+        }
+
+    @Test
+    fun `UC 2-1 both fields empty returns EMPTY_FIELDS failure`() =
+        runTest {
+            val result = loginUseCase(username = "", password = "")
+
+            assertTrue(result.isFailure)
+            assertEquals("EMPTY_FIELDS", result.exceptionOrNull()?.message)
+        }
 }
