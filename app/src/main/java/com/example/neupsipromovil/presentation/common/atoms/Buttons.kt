@@ -9,6 +9,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import com.example.neupsipromovil.presentation.theme.NeupsiproMovilTheme
 
 @Composable
 fun AccessibilityButton(
@@ -24,4 +26,13 @@ fun AccessibilityButton(
         icon = { Icon(Icons.Default.Accessibility, contentDescription = null) },
         text = { Text(text = "Accesibilidad") }
     )
+}
+
+// Les  voy a ser sincero, no supe como hacer para que fuera un circulo rectangulo
+@Preview(showBackground = true)
+@Composable
+fun AccessibilityButtonPreview() {
+    NeupsiproMovilTheme {
+        AccessibilityButton(onClick = {})
+    }
 }
