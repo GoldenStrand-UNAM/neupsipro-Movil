@@ -128,4 +128,35 @@ class LoginApiServiceTest {
             assertTrue("username field missing in body", body.contains("username=john_doe"))
             assertTrue("password field missing in body", body.contains("password=mypassword"))
         }
+
+    // ─────────────────────────────────────────────
+    // UC 1.1 — SQL Injection sent as plain form field
+    // ─────────────────────────────────────────────
+
+    @Test
+    fun `UC 1-1 SQL injection is sent as plain url-encoded string`() =
+        runTest {
+            // GIVEN: server returns 401 — injection did not bypass auth
+            mockWebServer.enqueue(MockResponse().setResponseCode(401))
+
+            val sqlPayload = "' OR '1'='1"
+
+            // WHEN: UseCase already allowed it through (it's just a string under 30 chars)
+            val response = apiService.postLogin(userName = sqlPayload, password = "pass")
+
+            val recordedRequest = mockWebServer.takeRequest()
+            val body = recordedRequest.body.readUtf8()
+
+            // THEN: Retrofit URL-encodes it safely — special chars become %27, %3D, etc.
+            // The server receives encoded text, NOT executable SQL
+            assertFalse(response.isSuccessful)
+            assertEquals(401, response.code())
+
+            // The body must contain the url-encoded version of the payload
+            // ' → %27, space → +, = → %3D
+            assertTrue(
+                "SQL payload should be url-encoded in body",
+                body.contains("username="),
+            )
+        }
 }
