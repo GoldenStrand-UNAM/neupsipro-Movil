@@ -239,11 +239,11 @@ class LoginApiServiceTest {
         }
 
     // ─────────────────────────────────────────────
-    // Converter — malformed JSON still returns a Response, not a crash
+    // Converter — wrong format JSON still returns a Response, not a crash
     // ─────────────────────────────────────────────
 
     @Test
-    fun `malformed JSON body causes converter exception wrapped by Retrofit`() =
+    fun `wrong format JSON body causes converter exception wrapped by Retrofit`() =
         runTest {
             // GIVEN: server returns 200 but with broken JSON
             mockWebServer.enqueue(
