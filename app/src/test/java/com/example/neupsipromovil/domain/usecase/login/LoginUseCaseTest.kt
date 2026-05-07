@@ -141,4 +141,31 @@ class LoginUseCaseTest {
             // THEN: treated as a normal string — no special blocking at UseCase level
             assertTrue(result.isSuccess)
         }
+
+    // ─────────────────────────────────────────────
+    // UC 3.1 — Same error message (enum-free approach)
+    // ─────────────────────────────────────────────
+
+    @Test
+    fun `UC 3-1 nonexistent user and wrong password return same error message`() =
+        runTest {
+            // GIVEN: server always returns the same generic error regardless of reason
+            val genericError = Exception("INVALID_CREDENTIALS")
+
+            whenever(loginRepository.login("ghost_user", "wrongpass")).thenReturn(
+                Result.failure(genericError),
+            )
+            whenever(loginRepository.login("real_user", "wrongpass")).thenReturn(
+                Result.failure(genericError),
+            )
+
+            val resultNonExistent = loginUseCase("ghost_user", "wrongpass")
+            val resultWrongPass = loginUseCase("real_user", "wrongpass")
+
+            // THEN: both responses carry the same message — UC 3.1.2
+            assertEquals(
+                resultNonExistent.exceptionOrNull()?.message,
+                resultWrongPass.exceptionOrNull()?.message,
+            )
+        }
 }
