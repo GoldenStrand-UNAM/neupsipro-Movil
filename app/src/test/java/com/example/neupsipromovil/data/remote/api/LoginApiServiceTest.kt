@@ -210,4 +210,60 @@ class LoginApiServiceTest {
             // The Retry-After header tells the app how long to wait
             assertEquals("900", response.headers()["Retry-After"])
         }
+
+    // ─────────────────────────────────────────────
+    // UC 3.2 — 401 Unauthorized (wrong credentials)
+    // ─────────────────────────────────────────────
+
+    @Test
+    fun `UC 3-2 wrong credentials return 401 with error body`() =
+        runTest {
+            // GIVEN: server rejects with 401 and a generic message
+            mockWebServer.enqueue(
+                MockResponse()
+                    .setResponseCode(401)
+                    .setBody("""{"error": "INVALID_CREDENTIALS"}""")
+                    .addHeader("Content-Type", "application/json"),
+            )
+
+            val response = apiService.postLogin(userName = "john", password = "wrongpass")
+
+            // THEN: Response wraps the error — body() is null on error, errorBody() has the message
+            assertFalse(response.isSuccessful)
+            assertEquals(401, response.code())
+
+            // body() is null for non-2xx — errorBody() carries the error JSON
+            val errorBody = response.errorBody()?.string()
+            assertNotNull(errorBody)
+            assertTrue(errorBody!!.contains("INVALID_CREDENTIALS"))
+        }
+
+    // ─────────────────────────────────────────────
+    // Converter — malformed JSON still returns a Response, not a crash
+    // ─────────────────────────────────────────────
+
+    @Test
+    fun `malformed JSON body causes converter exception wrapped by Retrofit`() =
+        runTest {
+            // GIVEN: server returns 200 but with broken JSON
+            mockWebServer.enqueue(
+                MockResponse()
+                    .setResponseCode(200)
+                    .setBody("NOT_VALID_JSON")
+                    .addHeader("Content-Type", "application/json"),
+            )
+
+            var threwException = false
+
+            try {
+                apiService.postLogin(userName = "john", password = "pass")
+            } catch (e: Exception) {
+                // Gson throws JsonSyntaxException when it can't deserialize the body
+                // With Response<T>, Retrofit still throws on converter failure
+                threwException = true
+            }
+
+            // THEN: app must handle this — it cannot silently return null data
+            assertTrue("Converter must throw on invalid JSON", threwException)
+        }
 }
