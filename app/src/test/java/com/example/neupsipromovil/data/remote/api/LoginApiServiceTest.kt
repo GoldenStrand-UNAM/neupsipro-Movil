@@ -159,4 +159,55 @@ class LoginApiServiceTest {
                 body.contains("username="),
             )
         }
+    // ─────────────────────────────────────────────
+    // UC 1.2 — XSS payload sent as plain url-encoded string
+    // ─────────────────────────────────────────────
+
+    @Test
+    fun `UC 1-2 XSS payload is url-encoded before leaving the device`() =
+        runTest {
+            mockWebServer.enqueue(MockResponse().setResponseCode(401))
+
+            val xssPayload = "<script>alert('xss')</script>"
+
+            val response = apiService.postLogin(userName = xssPayload, password = "pass")
+
+            val recordedRequest = mockWebServer.takeRequest()
+            val body = recordedRequest.body.readUtf8()
+
+            // THEN: < and > are url-encoded as %3C and %3E — cannot execute as HTML
+            assertFalse(response.isSuccessful)
+            assertTrue(body.contains("username="))
+
+            // %3C = '<' and %3E = '>' — Retrofit encoded them automatically
+            assertTrue(
+                "Angle brackets must be url-encoded",
+                body.contains("%3C") || body.contains("%3c"),
+            )
+        }
+
+    // ─────────────────────────────────────────────
+    // UC 1.3 — Server returns 429 Too Many Requests
+    // ─────────────────────────────────────────────
+
+    @Test
+    fun `UC 1-3 server returns 429 when rate limit is exceeded`() =
+        runTest {
+            // GIVEN: server blocks the request after too many calls
+            mockWebServer.enqueue(
+                MockResponse()
+                    .setResponseCode(429)
+                    .addHeader("Retry-After", "900"), // 900 seconds = 15 minutes (UC 3.2)
+            )
+
+            // WHEN: Retrofit gets the 429 — Response<T> does NOT throw, just wraps it
+            val response = apiService.postLogin(userName = "john", password = "pass")
+
+            // THEN: isSuccessful is false for any non-2xx code
+            assertFalse(response.isSuccessful)
+            assertEquals(429, response.code())
+
+            // The Retry-After header tells the app how long to wait
+            assertEquals("900", response.headers()["Retry-After"])
+        }
 }
