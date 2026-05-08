@@ -4,6 +4,10 @@ import com.google.gson.annotations.SerializedName
 
 data class UserProfileResponse(
     @SerializedName("success") val success: Boolean,
+    @SerializedName("data") val data: UserProfileData
+)
+
+data class UserProfileData(
     @SerializedName("personalInfo") val personalInfo: PersonalInfoDto,
     @SerializedName("clinicalInfo") val clinicalInfo: ClinicalInfoDto,
     @SerializedName("assignment") val assignment: AssignmentDto,

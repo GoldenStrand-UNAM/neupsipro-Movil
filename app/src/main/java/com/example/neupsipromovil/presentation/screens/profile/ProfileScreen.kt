@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.neupsipromovil.presentation.common.atoms.AccessibilityButton
+import com.example.neupsipromovil.presentation.common.molecules.profile.ProfileHeader
 import com.example.neupsipromovil.presentation.common.organisms.AppointmentCard
 import com.example.neupsipromovil.presentation.common.organisms.ClinicalInfoCard
 import com.example.neupsipromovil.presentation.common.organisms.StaffMemberCard
@@ -53,7 +54,7 @@ fun ProfileScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp)
+                    .height(280.dp)
                     .background(
                         color = Color(0xFF3F51B5),
                         shape = RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp)
@@ -67,7 +68,8 @@ fun ProfileScreen(
                 state.error != null -> {
                     Text(
                         text = "Error: ${state.error}",
-                        modifier = Modifier.align(Alignment.Center)
+                        modifier = Modifier.align(Alignment.Center),
+                        color = Color.Red
                     )
                 }
 
@@ -76,9 +78,16 @@ fun ProfileScreen(
 
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(16.dp),
+                        contentPadding = PaddingValues(top = 24.dp, bottom = 24.dp, start = 16.dp, end = 16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
+                        item {
+                            ProfileHeader(
+                                fullName = user.fullName,
+                                image = user.profilePhoto,
+                                stage = user.stage
+                            )
+                        }
                         item {
                             ClinicalInfoCard(
                                 age = user.age,
@@ -109,7 +118,7 @@ fun ProfileScreen(
                             StaffMemberCard(roleTitle = "Psicólogo", staffName = user.assignedClinic)
                             Spacer(modifier = Modifier.height(16.dp))
                             StaffMemberCard(roleTitle = "Prostesista", staffName = user.prosthetist)
-                            Spacer(modifier = Modifier.height(80.dp))
+                            Spacer(modifier = Modifier.height(100.dp))
                         }
                     }
                 }

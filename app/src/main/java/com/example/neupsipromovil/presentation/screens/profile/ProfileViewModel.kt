@@ -19,6 +19,7 @@ class ProfileViewModel @Inject constructor(
     val state: StateFlow<ProfileUiState> = _state.asStateFlow()
 
     fun getProfile(userId: String) {
+        println("DEBUG_VM: getProfile llamado con userId: '$userId'")
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, error = null) }
             val result = getUserProfileUseCase(userId)

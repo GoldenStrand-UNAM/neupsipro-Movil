@@ -4,17 +4,18 @@ import com.example.neupsipromovil.data.remote.dto.UserProfileResponse
 import com.example.neupsipromovil.domain.model.UserProfile
 
 fun UserProfileResponse.toDomain(): UserProfile {
+    val info = this.data
     return UserProfile(
-        fullName = this.personalInfo.fullName,
-        profilePhoto = this.personalInfo.profilePhoto,
-        age = this.personalInfo.age,
-        stage = this.clinicalInfo.stage ?: "Sin etapa",
-        neuroStatus = this.clinicalInfo.neuroStatus ?: "Desconocido",
-        unitEntryDate = this.clinicalInfo.unitEntryDate ?: "--/--/--",
-        neuroEntryDate = this.clinicalInfo.neuroEntryDate ?: "--/--/--",
-        nextAppointmentDate = this.nextAppointment?.date,
-        nextAppointmentTime = this.nextAppointment?.time,
-        assignedClinic = this.assignment.assignedClinic ?: "No asignado",
-        prosthetist = this.clinicalInfo.prosthetist ?: "No asignado"
+        fullName = info.personalInfo.fullName,
+        profilePhoto = info.personalInfo.profilePhoto,
+        age = info.personalInfo.age,
+        stage = info.clinicalInfo.stage ?: "Sin etapa",
+        neuroStatus = info.clinicalInfo.neuroStatus ?: "Desconocido",
+        unitEntryDate = info.clinicalInfo.unitEntryDate ?: "--/--/--",
+        neuroEntryDate = info.clinicalInfo.neuroEntryDate ?: "--/--/--",
+        nextAppointmentDate = info.nextAppointment?.date,
+        nextAppointmentTime = info.nextAppointment?.time,
+        assignedClinic = info.assignment.assignedClinic ?: "No asignado",
+        prosthetist = info.clinicalInfo.prosthetist ?: "No asignado"
     )
 }
