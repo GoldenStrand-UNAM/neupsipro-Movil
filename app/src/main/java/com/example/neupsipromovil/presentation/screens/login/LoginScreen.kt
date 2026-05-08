@@ -30,7 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-// import com.example.neupsipromovil.R
+import com.app.neupsiproMovil.R
 import com.example.neupsipromovil.presentation.common.atoms.AppText
 import com.example.neupsipromovil.presentation.common.atoms.PrimaryButton
 import com.example.neupsipromovil.presentation.common.atoms.SecondaryButton
@@ -41,6 +41,7 @@ import com.example.neupsipromovil.presentation.theme.Blue01
 import com.example.neupsipromovil.presentation.theme.LightBlue
 import com.example.neupsipromovil.presentation.theme.White
 
+@Suppress("ktlint:standard:function-naming")
 @Composable
 fun LoginScreen(
     onNavigateToHome: () -> Unit,
@@ -62,30 +63,32 @@ fun LoginScreen(
     val errorMessage = (loginState as? LoginUiState.Error)?.message
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(LightBlue.copy(alpha = 0.25f))
-            .verticalScroll(rememberScrollState()),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(LightBlue.copy(alpha = 0.25f))
+                .verticalScroll(rememberScrollState()),
     ) {
-
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(296.dp)
-                .background(Blue01),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(296.dp)
+                    .background(Blue01),
         ) {
             Row(
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .padding(horizontal = 24.dp),
+                modifier =
+                    Modifier
+                        .align(Alignment.Center)
+                        .padding(horizontal = 24.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                //Image(
-                  //  painter = painterResource(id = R.drawable.logo_enes),
-                    ///contentDescription = "ENES Juriquilla UNAM",
-                   // modifier = Modifier.size(72.dp),
-                //)
+                Image(
+                    painter = painterResource(id = R.drawable.logo_enes),
+                    contentDescription = "ENES Juriquilla UNAM",
+                    modifier = Modifier.size(72.dp),
+                )
                 Column {
                     AppText(
                         text = "Neupsi-Pro",
@@ -101,10 +104,11 @@ fun LoginScreen(
             }
             HelpBadge(
                 onClick = { /* TODO: open help */ },
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(end = 24.dp)
-                    .offset(y = 25.dp),
+                modifier =
+                    Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(end = 24.dp)
+                        .offset(y = 25.dp),
             )
         }
 
@@ -112,9 +116,10 @@ fun LoginScreen(
 
         // ── Form
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
@@ -157,9 +162,10 @@ fun LoginScreen(
 
         // ── Accessibility action
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             SecondaryButton(
