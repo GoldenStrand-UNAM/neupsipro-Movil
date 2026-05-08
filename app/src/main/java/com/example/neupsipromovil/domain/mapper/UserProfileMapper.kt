@@ -5,9 +5,11 @@ import com.example.neupsipromovil.domain.model.UserProfile
 
 fun UserProfileResponse.toDomain(): UserProfile {
     val info = this.data
+    val photoUrl = info.personalInfo.profilePhoto
+    println("DEBUG_DTO: El valor de photoUrl es: '$photoUrl'")
     return UserProfile(
         fullName = info.personalInfo.fullName,
-        profilePhoto = info.personalInfo.profilePhoto,
+        profilePhoto = photoUrl,
         age = info.personalInfo.age,
         stage = info.clinicalInfo.stage ?: "Sin etapa",
         neuroStatus = info.clinicalInfo.neuroStatus ?: "Desconocido",

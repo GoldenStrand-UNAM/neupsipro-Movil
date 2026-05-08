@@ -41,7 +41,7 @@ fun ClinicalInfoCard(
             )
             InfoRow(icon = Icons.Default.Cake, label = "Edad", value = "$age años")
             InfoRow(icon = Icons.AutoMirrored.Filled.Login, label = "Fecha de Ingreso unidad:", value = unitEntryDate)
-            InfoRow(icon = Icons.Default.MedicalServices, label = "Fecha de ingreso neuro:", value = neuroEntryDate)
+            InfoRow(icon = Icons.Default.MedicalServices, label = "Fecha de Ingreso neuropsicólogia:", value = neuroEntryDate)
         }
     }
 }

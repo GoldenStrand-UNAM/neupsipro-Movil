@@ -1,6 +1,5 @@
 package com.example.neupsipromovil.presentation.common.atoms
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -9,11 +8,13 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.app.arcabyolimpo.R
 import com.example.neupsipromovil.presentation.theme.NeupsiproMovilTheme
 
@@ -30,7 +31,18 @@ fun ProfileAvatar(
         tonalElevation = 2.dp
     ) {
         AsyncImage(
-            model = image ?: R.drawable.default_avatar,
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(image)
+                .crossfade(true)
+                .listener(
+                    onStart = { println("DEBUG_S3: Iniciando carga de imagen...") },
+                    onSuccess = { _, _ -> println("DEBUG_S3: ¡Imagen cargada con éxito!") },
+                    onError = { _, result ->
+                        println("DEBUG_S3: Error al cargar imagen. Causa: ${result.throwable}")
+                        // Esto te dirá si es un 403 Forbidden, 404 Not Found, etc.
+                    }
+                )
+                .build(),
             contentDescription = "Foto de Perfil",
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize(),
