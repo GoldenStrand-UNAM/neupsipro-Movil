@@ -36,7 +36,7 @@ fun NeuNavGraph(
     val isLoggedIn by loginViewModel.isLoggedIn.collectAsState()
 
     // Read once on initial composition
-    val startDestination = if (isLoggedIn) Screen.Home.route else Screen.Login.route
+    val startDestination = if (isLoggedIn) Screen.Profile.route else Screen.Login.route
 
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
 
@@ -51,7 +51,7 @@ fun NeuNavGraph(
                 }
             }
             isLoggedIn && currentRoute == Screen.Login.route -> {
-                navController.navigate(Screen.Home.route) {
+                navController.navigate(Screen.Profile.route) {
                     popUpTo(Screen.Login.route) { inclusive = true }
                     launchSingleTop = true
                 }
@@ -68,7 +68,7 @@ fun NeuNavGraph(
         composable(Screen.Login.route) {
             LoginScreen(
                 onNavigateToHome = {
-                    navController.navigate(Screen.Home.route) {
+                    navController.navigate(Screen.Profile.route) {
                         popUpTo(Screen.Login.route) { inclusive = true }
                     }
                 },

@@ -5,10 +5,13 @@ import android.content.SharedPreferences
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.example.neupsipromovil.data.local.AuthManager
+import com.example.neupsipromovil.data.remote.api.APIService
 import com.example.neupsipromovil.data.remote.api.AuthInterceptor
 import com.example.neupsipromovil.data.remote.api.LoginApiService
 import com.example.neupsipromovil.data.repository.LoginRepositoryImpl
+import com.example.neupsipromovil.data.repository.ProfileRepositoryImpl
 import com.example.neupsipromovil.domain.repository.LoginRepository
+import com.example.neupsipromovil.domain.repository.ProfileRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -52,11 +55,17 @@ object AppModule {
     @Singleton
     fun provideOkHttpClient(
         authInterceptor: AuthInterceptor
-    ): OkHttpClient = OkHttpClient.Builder()
-        .addInterceptor(authInterceptor)
-        .connectTimeout(30, TimeUnit.SECONDS)
-        .readTimeout(30, TimeUnit.SECONDS)
-        .build()
+    ): OkHttpClient{
+        val logging = okhttp3.logging.HttpLoggingInterceptor().apply {
+            level = okhttp3.logging.HttpLoggingInterceptor.Level.BODY
+        }
+        return OkHttpClient.Builder()
+            .addInterceptor(logging)
+            .addInterceptor(authInterceptor)
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .build()
+    }
 
     @Provides
     @Singleton
@@ -80,4 +89,14 @@ object AppModule {
         loginApiService: LoginApiService,
         authManager: AuthManager
     ): LoginRepository = LoginRepositoryImpl(loginApiService, authManager)
+
+    @Provides
+    @Singleton
+    fun provideApiService(retrofit: Retrofit): APIService =
+        retrofit.create(APIService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideProfileRepository(provideApiService: APIService): ProfileRepository =
+        ProfileRepositoryImpl(provideApiService)
 }

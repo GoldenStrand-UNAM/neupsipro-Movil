@@ -14,10 +14,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.neupsipromovil.presentation.common.atoms.ProfileAvatar
-import com.example.neupsipromovil.presentation.theme.NeupsiproMovilTheme
 
 @Composable
 fun StaffMemberCard(
@@ -49,17 +47,5 @@ fun StaffMemberCard(
                 )
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun StaffMemberCardPreview() {
-    NeupsiproMovilTheme {
-        StaffMemberCard(
-            roleTitle = "Psicológo",
-            staffName = "Dr. John Doe",
-            modifier = Modifier.padding(16.dp)
-        )
     }
 }

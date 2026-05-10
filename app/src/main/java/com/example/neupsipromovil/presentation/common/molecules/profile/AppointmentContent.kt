@@ -15,9 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.neupsipromovil.presentation.theme.NeupsiproMovilTheme
 
 @Composable
 fun AppointmentContent(
@@ -45,17 +43,5 @@ fun AppointmentContent(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun AppointmentContentPreview() {
-    NeupsiproMovilTheme {
-        AppointmentContent(
-            title = "Cita X",
-            time = "10:00 AM",
-            modifier = Modifier.padding(16.dp)
-        )
     }
 }

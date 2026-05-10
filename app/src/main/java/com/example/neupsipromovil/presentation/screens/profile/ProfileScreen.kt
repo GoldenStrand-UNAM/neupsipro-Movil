@@ -30,6 +30,9 @@ import com.example.neupsipromovil.presentation.common.molecules.profile.ProfileH
 import com.example.neupsipromovil.presentation.common.organisms.AppointmentCard
 import com.example.neupsipromovil.presentation.common.organisms.ClinicalInfoCard
 import com.example.neupsipromovil.presentation.common.organisms.StaffMemberCard
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @Composable
 fun ProfileScreen(
@@ -103,12 +106,19 @@ fun ProfileScreen(
                                     style = MaterialTheme.typography.titleMedium,
                                     modifier = Modifier.padding(bottom = 8.dp)
                                 )
-                                user.nextAppointmentDate?.let { date ->
+                                user.nextAppointmentDate?.let { dateString ->
+                                    val datePart = dateString.take(10)
+                                    val date = LocalDate.parse(datePart, DateTimeFormatter.ISO_LOCAL_DATE)
+                                    val monthName = date.month.getDisplayName(
+                                        java.time.format.TextStyle.SHORT,
+                                        Locale("es", "MX")
+                                    ).uppercase().replace(".", "")
+                                    val dayOfMonth = date.dayOfMonth.toString().padStart(2, '0')
                                     AppointmentCard(
-                                        month = "FEB",
-                                        day = date.takeLast(2),
+                                        month = monthName,
+                                        day = dayOfMonth,
                                         title = "Cita proxima",
-                                        time = user.nextAppointmentTime ?: "--:--"
+                                        time = user.nextAppointmentTime?.take(5) ?: "--:--"
                                     )
                                 }
                             }

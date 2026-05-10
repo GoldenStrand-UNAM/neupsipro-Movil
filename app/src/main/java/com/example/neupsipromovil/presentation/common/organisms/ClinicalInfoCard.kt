@@ -15,10 +15,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.neupsipromovil.presentation.common.molecules.profile.InfoRow
-import com.example.neupsipromovil.presentation.theme.NeupsiproMovilTheme
 
 @Composable
 fun ClinicalInfoCard(
@@ -43,18 +41,5 @@ fun ClinicalInfoCard(
             InfoRow(icon = Icons.AutoMirrored.Filled.Login, label = "Fecha de Ingreso unidad:", value = unitEntryDate)
             InfoRow(icon = Icons.Default.MedicalServices, label = "Fecha de Ingreso neuropsicólogia:", value = neuroEntryDate)
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ClinicalInfoCardPreview() {
-    NeupsiproMovilTheme {
-        ClinicalInfoCard(
-            age = 52,
-            unitEntryDate = "2022-01-01",
-            neuroEntryDate = "2020-01-01",
-            modifier = Modifier.padding(16.dp)
-        )
     }
 }

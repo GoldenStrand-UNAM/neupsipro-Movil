@@ -12,11 +12,9 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.neupsipromovil.presentation.common.atoms.DateBadge
 import com.example.neupsipromovil.presentation.common.molecules.profile.AppointmentContent
-import com.example.neupsipromovil.presentation.theme.NeupsiproMovilTheme
 
 @Composable
 fun AppointmentCard(
@@ -41,18 +39,5 @@ fun AppointmentCard(
             Spacer(modifier = Modifier.width(12.dp))
             AppointmentContent(title = title, time = time)
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun AppointmentCardPreview() {
-    NeupsiproMovilTheme {
-        AppointmentCard(
-            month = "FEB",
-            day = "28",
-            title = "Cita X",
-            time = "10:00 AM"
-        )
     }
 }
