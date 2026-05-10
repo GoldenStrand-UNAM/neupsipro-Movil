@@ -16,11 +16,12 @@ ktlint {
 }
 
 android {
-    namespace = "com.app.arcabyolimpo"
+    namespace = "com.app.neupsiproMovil"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.app.arcabyolimpo"
+        applicationId = "com.app.neupsiproMovil"
+        namespace = "com.app.neupsiproMovil"
         minSdk = 29
         targetSdk = 36
         versionCode = 1
@@ -28,7 +29,6 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -69,6 +69,8 @@ dependencies {
     implementation(libs.androidx.compose.ui)
 
     testImplementation(libs.junit)
+    testImplementation(libs.junit.jupiter)
+    testImplementation(libs.junit.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
@@ -99,12 +101,27 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
 
-    //Coil for image loading
+    // Coil for image loading
     implementation("io.coil-kt:coil-compose:2.5.0")
+
+    // Encrypt token
+    implementation("androidx.security:security-crypto:1.1.0-alpha06")
 
     // Material Pull to refresh
     implementation(libs.androidx.material)
 
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
+    // Mockito Kotlin — crea fakes/mocks de clases y interfaces
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
+
+    // Coroutines test — permite correr suspend functions en tests
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
+
+    // MockWebServer — levanta un servidor HTTP falso local
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
+
+    // Retrofit — mismo que usas en producción
+    testImplementation("com.squareup.retrofit2:retrofit:2.9.0")
+    testImplementation("com.squareup.retrofit2:converter-gson:2.9.0")
 }
