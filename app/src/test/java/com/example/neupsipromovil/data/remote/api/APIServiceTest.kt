@@ -118,4 +118,49 @@ class APIServiceTest {
             assertEquals("2024-06-15", response.data.nextAppointment?.date)
             assertEquals("10:00 AM", response.data.nextAppointment?.time)
         }
+    // ─────────────────────────────────────────────
+    // Verify the request hits the correct path
+    // ─────────────────────────────────────────────
+
+    @Test
+    fun `request path includes userId as path parameter`() =
+        runTest {
+            val uuid = "550e8400-e29b-41d4-a716-446655440000"
+            mockWebServer.enqueue(
+                MockResponse()
+                    .setResponseCode(200)
+                    .setBody("""{"user_id":"$uuid","username":"john","email":"j@j.com","full_name":"John","avatar_url":null}""")
+                    .addHeader("Content-Type", "application/json"),
+            )
+
+            apiService.getUserProfile(uuid)
+
+            val recordedRequest = mockWebServer.takeRequest()
+
+            // THEN: Retrofit correctly interpolated the UUID into the path
+            assertEquals("/api/profile/$uuid", recordedRequest.path)
+            assertEquals("GET", recordedRequest.method)
+        }
+
+    // ─────────────────────────────────────────────
+    // UC 1.1 — No authentication — server returns 401
+    // ─────────────────────────────────────────────
+
+    @Test
+    fun `UC 1-1 request without token causes server to return 401`() =
+        runTest {
+            // GIVEN: server rejects because no Authorization header was sent
+            mockWebServer.enqueue(MockResponse().setResponseCode(401))
+
+            var statusCode = 0
+            try {
+                // APIService uses @GET without Response<T> wrapper — 401 throws HttpException
+                apiService.getUserProfile("any-uuid")
+            } catch (e: retrofit2.HttpException) {
+                statusCode = e.code()
+            }
+
+            // THEN: app receives 401 and must redirect to login (UC 1.7)
+            assertEquals(401, statusCode)
+        }
 }
