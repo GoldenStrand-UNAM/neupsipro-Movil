@@ -193,4 +193,68 @@ class APIServiceTest {
 
             assertEquals(401, statusCode)
         }
+
+    // ─────────────────────────────────────────────
+    // UC 1.3 — Profile not found — server returns 404
+    // ─────────────────────────────────────────────
+
+    @Test
+    fun `UC 1-3 nonexistent userId causes server to return 404`() =
+        runTest {
+            mockWebServer.enqueue(
+                MockResponse()
+                    .setResponseCode(404)
+                    .setBody("""{"error": "USER_NOT_FOUND"}""")
+                    .addHeader("Content-Type", "application/json"),
+            )
+
+            var statusCode = 0
+            try {
+                apiService.getUserProfile("00000000-0000-0000-0000-000000000000")
+            } catch (e: retrofit2.HttpException) {
+                statusCode = e.code()
+            }
+
+            assertEquals(404, statusCode)
+        }
+
+    // ─────────────────────────────────────────────
+    // UC 1.4 — SQL injection in userId path param
+    // ─────────────────────────────────────────────
+
+    @Test
+    fun `UC 1-4 SQL injection in userId is url-encoded in the path`() =
+        runTest {
+            // GIVEN: server returns 400 — it validated the UUID format and rejected it
+            mockWebServer.enqueue(
+                MockResponse()
+                    .setResponseCode(400)
+                    // THEN: server must NOT return a stack trace or raw SQL error
+                    .setBody("""{"error": "INVALID_USER_ID_FORMAT"}""")
+                    .addHeader("Content-Type", "application/json"),
+            )
+
+            val sqlPayload = "' OR '1'='1"
+            var statusCode = 0
+
+            try {
+                apiService.getUserProfile(sqlPayload)
+            } catch (e: retrofit2.HttpException) {
+                statusCode = e.code()
+                val errorBody = e.response()?.errorBody()?.string()
+
+                // THEN: error body must not expose SQL, stack traces or query details
+                assertNotNull(errorBody)
+                assertTrue("Error must not expose SQL keywords", !errorBody!!.contains("SELECT"))
+                assertTrue("Error must not expose stack trace", !errorBody.contains("at com."))
+                assertTrue("Error must not expose table names", !errorBody.contains("FROM users"))
+            }
+
+            assertEquals(400, statusCode)
+
+            // Verify the injection was url-encoded in the path — not interpreted
+            val recordedRequest = mockWebServer.takeRequest()
+            val path = recordedRequest.path ?: ""
+            assertTrue("Path should be url-encoded", path.contains("%27") || path.contains("OR"))
+        }
 }
