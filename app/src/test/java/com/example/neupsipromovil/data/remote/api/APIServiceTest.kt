@@ -163,4 +163,34 @@ class APIServiceTest {
             // THEN: app receives 401 and must redirect to login (UC 1.7)
             assertEquals(401, statusCode)
         }
+
+    // ─────────────────────────────────────────────
+    // UC 1.2 — Expired token — server returns 401
+    // Same HTTP code as no-auth — the app treats both identically
+    // ─────────────────────────────────────────────
+
+    @Test
+    fun `UC 1-2 expired token returns 401 same as no token`() =
+        runTest {
+            // GIVEN: server identifies the token as expired
+            mockWebServer.enqueue(
+                MockResponse()
+                    .setResponseCode(401)
+                    .setBody("""{"error": "TOKEN_EXPIRED"}""")
+                    .addHeader("Content-Type", "application/json"),
+            )
+
+            var statusCode = 0
+            try {
+                apiService.getUserProfile("any-uuid")
+            } catch (e: retrofit2.HttpException) {
+                statusCode = e.code()
+                // errorBody carries the reason — use it to differentiate expired vs missing
+                val errorBody = e.response()?.errorBody()?.string()
+                assertNotNull(errorBody)
+                assertTrue(errorBody!!.contains("TOKEN_EXPIRED"))
+            }
+
+            assertEquals(401, statusCode)
+        }
 }
