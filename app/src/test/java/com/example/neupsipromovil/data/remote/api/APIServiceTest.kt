@@ -5,6 +5,9 @@ import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.After
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import retrofit2.Retrofit
@@ -16,6 +19,7 @@ class APIServiceTest {
 
     @Before
     fun setup() {
+        // Wakes up a fake http server
         mockWebServer = MockWebServer()
         mockWebServer.start()
 
@@ -25,6 +29,7 @@ class APIServiceTest {
         apiService =
             Retrofit
                 .Builder()
+                // Fake Server
                 .baseUrl(mockWebServer.url("/"))
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -32,6 +37,7 @@ class APIServiceTest {
                 .create(APIService::class.java)
     }
 
+    // Shut down server after each tests
     @After
     fun tearDown() {
         mockWebServer.shutdown()
@@ -83,6 +89,33 @@ class APIServiceTest {
                     ).addHeader("Content-Type", "application/json"),
             )
 
+            // Save all the request for verification
             val response = apiService.getUserProfile(uuid)
+
+            // THEN: UserProfileResponse is parsed correctly
+            assertTrue(response.success)
+            assertNotNull(response.data)
+
+            // THEN: PersonalInfo fields parsed correctly
+            assertEquals("John Doe", response.data.personalInfo.fullName)
+            assertEquals("https://cdn.example.com/avatar.jpg", response.data.personalInfo.profilePhoto)
+            assertEquals("1994-05-15", response.data.personalInfo.birthDate)
+            assertEquals(30, response.data.personalInfo.age)
+
+            // THEN: ClinicalInfo fields parsed correctly
+            assertEquals("2024-01-15", response.data.clinicalInfo.unitEntryDate)
+            assertEquals("2024-01-20", response.data.clinicalInfo.neuroEntryDate)
+            assertEquals("Active", response.data.clinicalInfo.neuroStatus)
+            assertEquals("P001", response.data.clinicalInfo.protocol)
+            assertEquals("Stand By", response.data.clinicalInfo.stage)
+            assertEquals("Dr. Pedro", response.data.clinicalInfo.prosthetist)
+
+            // THEN: Assignment fields parsed correctly
+            assertEquals("rel123", response.data.assignment.relationId)
+            assertEquals("maria", response.data.assignment.assignedClinic)
+
+            // THEN: NextAppointment fields parsed correctly
+            assertEquals("2024-06-15", response.data.nextAppointment?.date)
+            assertEquals("10:00 AM", response.data.nextAppointment?.time)
         }
 }
