@@ -76,4 +76,25 @@ class GetUserProfileUseCaseTest {
             assertTrue(result.isFailure)
             assertEquals("NOT_FOUND", result.exceptionOrNull()?.message)
         }
+
+    // ─────────────────────────────────────────────
+    // UC 1.1 / 1.2 — No auth or expired token
+    // At UseCase level this arrives as UNAUTHORIZED from the repository
+    // ─────────────────────────────────────────────
+
+    @Test
+    fun `UC 1-1 and 1-2 unauthorized access returns UNAUTHORIZED failure`() =
+        runTest {
+            // GIVEN: repository signals a 401 — no token or expired token
+            val uuid = "550e8400-e29b-41d4-a716-446655440000"
+
+            whenever(profileRepository.getUserProfile(uuid)).thenReturn(
+                Result.failure(Exception("UNAUTHORIZED")),
+            )
+
+            val result = getUserProfileUseCase(uuid)
+
+            assertTrue(result.isFailure)
+            assertEquals("UNAUTHORIZED", result.exceptionOrNull()?.message)
+        }
 }
