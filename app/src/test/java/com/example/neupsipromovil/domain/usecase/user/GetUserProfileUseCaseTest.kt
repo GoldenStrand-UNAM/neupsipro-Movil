@@ -97,4 +97,24 @@ class GetUserProfileUseCaseTest {
             assertTrue(result.isFailure)
             assertEquals("UNAUTHORIZED", result.exceptionOrNull()?.message)
         }
+
+    // ─────────────────────────────────────────────
+    // UC 1.5 — Forbidden: user tries to access another user's profile
+    // ─────────────────────────────────────────────
+
+    @Test
+    fun `UC 1-5 accessing another user profile returns FORBIDDEN failure`() =
+        runTest {
+            // GIVEN: userId belongs to a different user — server returns 403
+            val otherUserUuid = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+
+            whenever(profileRepository.getUserProfile(otherUserUuid)).thenReturn(
+                Result.failure(Exception("FORBIDDEN")),
+            )
+
+            val result = getUserProfileUseCase(otherUserUuid)
+
+            assertTrue(result.isFailure)
+            assertEquals("FORBIDDEN", result.exceptionOrNull()?.message)
+        }
 }

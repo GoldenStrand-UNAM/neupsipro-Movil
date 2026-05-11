@@ -114,6 +114,7 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
     // Mockito Kotlin — crea fakes/mocks de clases y interfaces
+    testImplementation("org.mockito:mockito-core:5.2.1")
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
 
     // Coroutines test — permite correr suspend functions en tests
