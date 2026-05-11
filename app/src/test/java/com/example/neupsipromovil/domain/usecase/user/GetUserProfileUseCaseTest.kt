@@ -117,4 +117,21 @@ class GetUserProfileUseCaseTest {
             assertTrue(result.isFailure)
             assertEquals("FORBIDDEN", result.exceptionOrNull()?.message)
         }
+
+    @Test
+    fun `UC 1-6 no internet connection returns NO_CONNECTION failure`() =
+        runTest {
+            // GIVEN: device has no network — OkHttp throws IOException
+            // Repository catches it and maps to NO_CONNECTION
+            val uuid = "550e8400-e29b-41d4-a716-446655440000"
+
+            whenever(profileRepository.getUserProfile(uuid)).thenReturn(
+                Result.failure(Exception("NO_CONNECTION")),
+            )
+
+            val result = getUserProfileUseCase(uuid)
+
+            assertTrue(result.isFailure)
+            assertEquals("NO_CONNECTION", result.exceptionOrNull()?.message)
+        }
 }
