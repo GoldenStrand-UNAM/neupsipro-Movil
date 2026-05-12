@@ -117,4 +117,28 @@ class ProfileViewModelTest {
             assertNull(state.user)
             assertFalse(state.isLoading)
         }
+
+    // ─────────────────────────────────────────────
+    // UC 1.7 — Expired token clears session
+    // ViewModel signals UNAUTHORIZED — UI reacts by clearing local session
+    // ─────────────────────────────────────────────
+
+    @Test
+    fun `UC 1-7 expired token sets UNAUTHORIZED error and no user in state`() =
+        runTest {
+            val uuid = "550e8400-e29b-41d4-a716-446655440000"
+
+            whenever(getUserProfileUseCase(uuid)).thenReturn(
+                Result.failure(Exception("UNAUTHORIZED")),
+            )
+
+            viewModel.getProfile(uuid)
+            advanceUntilIdle()
+
+            val state = viewModel.state.value
+
+            // THEN: user is null — no stale profile should remain visible
+            assertNull(state.user)
+            assertEquals("UNAUTHORIZED", state.error)
+        }
 }
