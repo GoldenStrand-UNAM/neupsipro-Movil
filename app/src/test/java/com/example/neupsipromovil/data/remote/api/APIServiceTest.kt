@@ -257,4 +257,31 @@ class APIServiceTest {
             val path = recordedRequest.path ?: ""
             assertTrue("Path should be url-encoded", path.contains("%27") || path.contains("OR"))
         }
+
+    // ─────────────────────────────────────────────
+    // UC 1.5 — Accessing another user's profile — server returns 403
+    // ─────────────────────────────────────────────
+
+    @Test
+    fun `UC 1-5 accessing another users profile returns 403 Forbidden`() =
+        runTest {
+            // GIVEN: the token belongs to user A but the UUID is user B's profile
+            mockWebServer.enqueue(
+                MockResponse()
+                    .setResponseCode(403)
+                    .setBody("""{"error": "FORBIDDEN"}""")
+                    .addHeader("Content-Type", "application/json"),
+            )
+
+            var statusCode = 0
+            try {
+                // userId here belongs to a different user than the token owner
+                apiService.getUserProfile("other-user-uuid-1234")
+            } catch (e: retrofit2.HttpException) {
+                statusCode = e.code()
+            }
+
+            // THEN: 403 is different from 401 — user is authenticated but not authorized
+            assertEquals(403, statusCode)
+        }
 }
