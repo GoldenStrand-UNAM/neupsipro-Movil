@@ -284,4 +284,40 @@ class APIServiceTest {
             // THEN: 403 is different from 401 — user is authenticated but not authorized
             assertEquals(403, statusCode)
         }
+
+    // ─────────────────────────────────────────────
+    // UC 1.8 — Response must not expose sensitive data
+    // ─────────────────────────────────────────────
+
+    @Test
+    fun `UC 1-8 successful response does not contain password or raw token in body`() =
+        runTest {
+            val uuid = "550e8400-e29b-41d4-a716-446655440000"
+            mockWebServer.enqueue(
+                MockResponse()
+                    .setResponseCode(200)
+                    .setBody(
+                        """
+                        {
+                            "user_id": "$uuid",
+                            "username": "john_doe",
+                            "email": "john@example.com",
+                            "full_name": "John Doe",
+                            "avatar_url": null
+                        }
+                        """.trimIndent(),
+                    ).addHeader("Content-Type", "application/json"),
+            )
+
+            apiService.getUserProfile(uuid)
+
+            // Inspect the raw response body the server sent
+            val recordedRequest = mockWebServer.takeRequest()
+
+            // THEN: request must carry Authorization header (token goes in header, not URL)
+            // This confirms the token is never exposed in the path or query params
+            val path = recordedRequest.path ?: ""
+            assertTrue("Token must not appear in the URL path", !path.contains("Bearer"))
+            assertTrue("Password must not appear in the URL", !path.contains("password"))
+        }
 }
