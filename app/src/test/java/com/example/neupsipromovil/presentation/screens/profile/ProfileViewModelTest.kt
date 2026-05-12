@@ -93,4 +93,28 @@ class ProfileViewModelTest {
             assertFalse(state.isLoading)
             assertNull(state.error)
         }
+
+    // ─────────────────────────────────────────────
+    // UC 1.1 / 1.2 — Unauthorized — ViewModel stores error
+    // ─────────────────────────────────────────────
+
+    @Test
+    fun `UC 1-1 and 1-2 UNAUTHORIZED error is stored in state`() =
+        runTest {
+            val uuid = "550e8400-e29b-41d4-a716-446655440000"
+
+            whenever(getUserProfileUseCase(uuid)).thenReturn(
+                Result.failure(Exception("UNAUTHORIZED")),
+            )
+
+            viewModel.getProfile(uuid)
+            advanceUntilIdle()
+
+            val state = viewModel.state.value
+
+            // THEN: ViewModel stores the error — UI layer decides to redirect to login (UC 1.7)
+            assertEquals("UNAUTHORIZED", state.error)
+            assertNull(state.user)
+            assertFalse(state.isLoading)
+        }
 }
