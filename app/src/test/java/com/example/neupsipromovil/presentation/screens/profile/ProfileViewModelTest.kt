@@ -141,4 +141,28 @@ class ProfileViewModelTest {
             assertNull(state.user)
             assertEquals("UNAUTHORIZED", state.error)
         }
+
+    // ─────────────────────────────────────────────
+    // UC 1.6 — No internet connection
+    // ─────────────────────────────────────────────
+
+    @Test
+    fun `UC 1-6 NO_CONNECTION error is stored in state`() =
+        runTest {
+            val uuid = "550e8400-e29b-41d4-a716-446655440000"
+
+            whenever(getUserProfileUseCase(uuid)).thenReturn(
+                Result.failure(Exception("NO_CONNECTION")),
+            )
+
+            viewModel.getProfile(uuid)
+            advanceUntilIdle()
+
+            val state = viewModel.state.value
+
+            // THEN: UI observes NO_CONNECTION and shows the offline message (UC 1.6.1)
+            assertEquals("NO_CONNECTION", state.error)
+            assertNull(state.user)
+            assertFalse(state.isLoading)
+        }
 }
