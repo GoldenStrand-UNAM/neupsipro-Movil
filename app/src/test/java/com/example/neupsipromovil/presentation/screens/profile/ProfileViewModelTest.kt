@@ -165,4 +165,53 @@ class ProfileViewModelTest {
             assertNull(state.user)
             assertFalse(state.isLoading)
         }
+
+    // ─────────────────────────────────────────────
+    // UC 2.1 — Profile with empty/null fields does not crash
+
+    // ─────────────────────────────────────────────
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `UC 2-1 profile with empty fields updates state without crashing`() =
+        runTest {
+            val uuid = "550e8400-e29b-41d4-a716-446655440000"
+
+            // GIVEN: Profile has minimal data — some fields empty, some null
+            // The mapper already converted nulls to empty strings before reaching ViewModel
+            val profileWithEmptyFields =
+                UserProfile(
+                    fullName = "",
+                    profilePhoto = null,
+                    age = 0,
+                    stage = "",
+                    neuroStatus = "",
+                    unitEntryDate = "",
+                    neuroEntryDate = "",
+                    nextAppointmentDate = null,
+                    nextAppointmentTime = null,
+                    assignedClinic = "",
+                    prosthetist = "",
+                )
+
+            // Mock the suspend function with proper syntax (invoke + any matcher)
+            whenever(getUserProfileUseCase.invoke(any())).thenReturn(
+                Result.success(profileWithEmptyFields),
+            )
+
+            // WHEN: ViewModel processes a profile with all empty fields
+            viewModel.getProfile(uuid)
+            advanceUntilIdle()
+
+            val state = viewModel.state.value
+
+            // THEN: state is success — no crash, no error (UC 2.1.2)
+            // UI is responsible for displaying empty fields correctly (UC 2.1.1)
+            assertNotNull(state.user)
+            assertEquals("", state.user?.fullName)
+            assertEquals("", state.user?.stage)
+            assertNull(state.user?.profilePhoto)
+            assertNull(state.error)
+            assertFalse(state.isLoading)
+        }
 }
