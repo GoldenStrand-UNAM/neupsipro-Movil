@@ -51,7 +51,8 @@ fun NeuNavGraph(
                 }
             }
             isLoggedIn && currentRoute == Screen.Login.route -> {
-                navController.navigate(Screen.Profile.route) {
+                val userId = loginViewModel.getLoggedInUserId() ?: "u-016"
+                navController.navigate(Screen.Profile.createRoute(userId)) {
                     popUpTo(Screen.Login.route) { inclusive = true }
                     launchSingleTop = true
                 }
@@ -68,7 +69,8 @@ fun NeuNavGraph(
         composable(Screen.Login.route) {
             LoginScreen(
                 onNavigateToHome = {
-                    navController.navigate(Screen.Profile.route) {
+                    val userId = loginViewModel.getLoggedInUserId() ?: "u-016"
+                    navController.navigate(Screen.Profile.createRoute(userId)) {
                         popUpTo(Screen.Login.route) { inclusive = true }
                     }
                 },
@@ -83,7 +85,13 @@ fun NeuNavGraph(
                 defaultValue = "u-016"
             })
         ) { backStackEntry ->
-            val userId = backStackEntry.arguments?.getString("userId") ?: "u-016"
+            val argumentId = backStackEntry.arguments?.getString("userId")
+            val userId = if (argumentId == "{userId}" || argumentId == "u-016") {
+                loginViewModel.getLoggedInUserId() ?: "u-016"
+            } else {
+                argumentId ?: "u-016"
+            }
+
             ProfileScreen(userId = userId, navController = navController)
         }
     }

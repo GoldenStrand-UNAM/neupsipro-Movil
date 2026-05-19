@@ -79,4 +79,13 @@ class AuthManager @Inject constructor(
             null
         }
     }
+    fun getUserId(): String? {
+        val payload = decodePayload() ?: return null
+        return try {
+            payload.getString("userId")
+        } catch (e: Exception) {
+            Log.w(tag, "Couldn't get userId from JWT: ${e.message}")
+            null
+        }
+    }
 }
