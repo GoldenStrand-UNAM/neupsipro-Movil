@@ -33,6 +33,9 @@ import com.example.neupsipromovil.presentation.common.organisms.StaffMemberCard
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.statusBars
 
 @Composable
 fun ProfileScreen(
@@ -45,6 +48,8 @@ fun ProfileScreen(
         viewModel.getProfile(userId)
     }
 
+    val statusBarPadding = WindowInsets.statusBars.asPaddingValues()
+
     Scaffold(
         floatingActionButton = {
             AccessibilityButton(onClick = { /*Logica de accesibilidad*/ })
@@ -53,86 +58,98 @@ fun ProfileScreen(
             // Implementar el Navbar aqui cuando este  completo
         }
     ) { paddingValues ->
-        Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(280.dp)
-                    .background(
-                        color = Color(0xFF3F51B5),
-                        shape = RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp)
-                    )
-            )
-            when {
-                state.isLoading -> {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                }
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .background(Color(0xFFF5F5F5))
+            ) {
+                when {
+                    state.isLoading -> {
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                    }
 
-                state.error != null -> {
-                    Text(
-                        text = "Error: ${state.error}",
-                        modifier = Modifier.align(Alignment.Center),
-                        color = Color.Red
-                    )
-                }
+                    state.error != null -> {
+                        Text(
+                            text = "Error: ${state.error}",
+                            modifier = Modifier.align(Alignment.Center),
+                            color = Color.Red
+                        )
+                    }
 
-                state.user != null -> {
-                    val user = state.user!!
+                    state.user != null -> {
+                        val user = state.user!!
 
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(top = 24.dp, bottom = 24.dp, start = 16.dp, end = 16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        item {
-                            ProfileHeader(
-                                fullName = user.fullName,
-                                image = user.profilePhoto,
-                                stage = user.stage
-                            )
-                        }
-                        item {
-                            ClinicalInfoCard(
-                                age = user.age,
-                                unitEntryDate = user.unitEntryDate,
-                                neuroEntryDate = user.neuroEntryDate
-                            )
-                            Spacer(modifier = Modifier.height(24.dp))
-                        }
-                        item {
-                            Column(modifier = Modifier.fillMaxWidth()) {
-                                Text(
-                                    text = "Próximas citas",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    modifier = Modifier.padding(bottom = 8.dp)
-                                )
-                                user.nextAppointmentDate?.let { dateString ->
-                                    val datePart = dateString.take(10)
-                                    val date = LocalDate.parse(datePart, DateTimeFormatter.ISO_LOCAL_DATE)
-                                    val monthName = date.month.getDisplayName(
-                                        java.time.format.TextStyle.SHORT,
-                                        Locale("es", "MX")
-                                    ).uppercase().replace(".", "")
-                                    val dayOfMonth = date.dayOfMonth.toString().padStart(2, '0')
-                                    AppointmentCard(
-                                        month = monthName,
-                                        day = dayOfMonth,
-                                        title = "Cita proxima",
-                                        time = user.nextAppointmentTime?.take(5) ?: "--:--"
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(bottom = 24.dp)
+                        ) {
+                            item {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .background(
+                                            color = Color(0xFF3F51B5),
+                                            shape = RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp)
+                                        )
+                                        .padding(top = statusBarPadding.calculateTopPadding())
+                                        .padding(horizontal = 16.dp, vertical = 24.dp)
+                                ) {
+                                    ProfileHeader(
+                                        fullName = user.fullName,
+                                        image = user.profilePhoto,
+                                        stage = user.stage
                                     )
                                 }
                             }
-                            Spacer(modifier = Modifier.height(24.dp))
-                        }
-                        item {
-                            StaffMemberCard(roleTitle = "Psicólogo", staffName = user.assignedClinic)
-                            Spacer(modifier = Modifier.height(16.dp))
-                            StaffMemberCard(roleTitle = "Prostesista", staffName = user.prosthetist)
-                            Spacer(modifier = Modifier.height(100.dp))
+                            item {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp)
+                                ) {
+                                    Spacer(modifier = Modifier.height(16.dp))
+
+                                    ClinicalInfoCard(
+                                        age = user.age,
+                                        unitEntryDate = user.unitEntryDate,
+                                        neuroEntryDate = user.neuroEntryDate
+                                    )
+
+                                    Spacer(modifier = Modifier.height(24.dp))
+
+                                    Text(
+                                        text = "Próximas citas",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        modifier = Modifier.padding(bottom = 8.dp)
+                                    )
+                                    user.nextAppointmentDate?.let { dateString ->
+                                        val datePart = dateString.take(10)
+                                        val date = LocalDate.parse(datePart, DateTimeFormatter.ISO_LOCAL_DATE)
+                                        val monthName = date.month.getDisplayName(
+                                            java.time.format.TextStyle.SHORT,
+                                            Locale("es", "MX")
+                                        ).uppercase().replace(".", "")
+                                        val dayOfMonth = date.dayOfMonth.toString().padStart(2, '0')
+                                        AppointmentCard(
+                                            month = monthName,
+                                            day = dayOfMonth,
+                                            title = "Cita proxima",
+                                            time = user.nextAppointmentTime?.take(5) ?: "--:--"
+                                        )
+                                    }
+
+                                    Spacer(modifier = Modifier.height(24.dp))
+
+                                    StaffMemberCard(roleTitle = "Psicólogo", staffName = user.assignedClinic)
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                    StaffMemberCard(roleTitle = "Prostesista", staffName = user.prosthetist)
+                                    Spacer(modifier = Modifier.height(100.dp))
+                                }
+                            }
                         }
                     }
                 }
             }
         }
     }
-}

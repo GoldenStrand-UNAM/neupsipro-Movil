@@ -34,6 +34,9 @@ fun ProfileHeader(
             color = Color.White,
             fontWeight = FontWeight.Bold
         )
-        StatusTag(status = stage)
+        StatusTag(
+            status = stage,
+            color = Color.White
+        )
     }
 }
