@@ -1,5 +1,6 @@
 package com.example.neupsipromovil.presentation.screens.profile
 
+import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,6 +37,9 @@ import java.util.Locale
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
 
 @Composable
 fun ProfileScreen(
@@ -46,6 +50,14 @@ fun ProfileScreen(
     val state by viewModel.state.collectAsState()
     LaunchedEffect(key1 = userId) {
         viewModel.getProfile(userId)
+    }
+
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        SideEffect {
+            val window = (view.context as Activity).window
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = true
+        }
     }
 
     val statusBarPadding = WindowInsets.statusBars.asPaddingValues()
