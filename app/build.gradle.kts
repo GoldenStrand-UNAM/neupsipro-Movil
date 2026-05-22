@@ -65,9 +65,14 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.compose.runtime.saveable)
+    implementation(libs.androidx.compose.runtime)
+    implementation(libs.androidx.compose.ui)
 
     testImplementation(libs.junit)
     testImplementation(libs.junit.jupiter)
+    testImplementation(libs.junit.junit)
+    testImplementation(libs.junit.junit)
+    testImplementation(libs.junit.junit)
     testImplementation(libs.junit.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -108,7 +113,10 @@ dependencies {
     // Material Pull to refresh
     implementation(libs.androidx.material)
 
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+
     // Mockito Kotlin — crea fakes/mocks de clases y interfaces
+    testImplementation("org.mockito:mockito-core:5.2.1")
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
 
     // Coroutines test — permite correr suspend functions en tests

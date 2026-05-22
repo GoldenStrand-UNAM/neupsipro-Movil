@@ -14,7 +14,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase,
-    authManager: AuthManager
+    private val authManager: AuthManager
 ) : ViewModel() {
 
     val isLoggedIn: StateFlow<Boolean> = authManager.sessionState
@@ -59,4 +59,8 @@ class LoginViewModel @Inject constructor(
     }
 
     fun resetState() { _loginState.value = LoginUiState.Idle }
+
+    fun getLoggedInUserId(): String? {
+        return authManager.getUserId()
+    }
 }
