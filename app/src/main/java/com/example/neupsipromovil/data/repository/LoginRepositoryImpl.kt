@@ -2,6 +2,7 @@ package com.example.neupsipromovil.data.repository
 
 import android.util.Log
 import com.example.neupsipromovil.data.local.AuthManager
+import com.example.neupsipromovil.data.remote.api.APIService
 import com.example.neupsipromovil.data.remote.api.LoginApiService
 import com.example.neupsipromovil.domain.model.Login
 import com.example.neupsipromovil.domain.repository.LoginRepository
@@ -15,6 +16,7 @@ import javax.inject.Singleton
 @Singleton
 class LoginRepositoryImpl @Inject constructor(
     private val loginApiService: LoginApiService,
+    private val apiService: APIService,
     private val authManager: AuthManager
 ) : LoginRepository {
 
@@ -52,4 +54,31 @@ class LoginRepositoryImpl @Inject constructor(
                 Result.failure(Exception("NETWORK_ERROR"))
             }
         }
+    override suspend fun logout(): Result<Unit> {
+        return try {
+            val sessionId = authManager.getSessionId()
+            Log.d("DEBUG_LOGOUT", "sessionId: $sessionId")
+
+            if (!sessionId.isNullOrBlank()) {
+                val response = apiService.logout(authHeader = "Bearer $sessionId")
+
+                if (response.isSuccessful) {
+                    Log.d("DEBUG_LOGOUT", "Logout exitoso")
+                    authManager.clearSession()
+                    Result.success(Unit)
+                } else {
+                    Log.e("DEBUG_LOGOUT", "Error en el servidor: ${response.code()}")
+                    authManager.clearSession()
+                    Result.failure(Exception("Error en el servidor: ${response.code()}"))
+                }
+            } else {
+                authManager.clearSession()
+                Result.success(Unit)
+            }
+        } catch (e: Exception) {
+            Log.e("DEBUG_LOGOUT", "Error al cerrar sesión: ${e.message}")
+            authManager.clearSession()
+            Result.failure(Exception("Error al cerrar sesión: ${e.message}"))
+        }
+    }
 }

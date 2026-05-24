@@ -88,4 +88,14 @@ class AuthManager @Inject constructor(
             null
         }
     }
+    fun getSessionId(): String? {
+        val payload = decodePayload() ?: return null
+        println("DEBUG_JWT: $payload")
+        return try {
+            payload.getString("session")
+        } catch (e: Exception) {
+            Log.w(tag, "Couldn't get sessionId from JWT: ${e.message}")
+            null
+        }
+    }
 }

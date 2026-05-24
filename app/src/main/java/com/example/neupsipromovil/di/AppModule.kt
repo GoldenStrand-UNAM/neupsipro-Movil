@@ -87,8 +87,9 @@ object AppModule {
     @Singleton
     fun provideLoginRepository(
         loginApiService: LoginApiService,
+        apiService: APIService,
         authManager: AuthManager
-    ): LoginRepository = LoginRepositoryImpl(loginApiService, authManager)
+    ): LoginRepository = LoginRepositoryImpl(loginApiService, apiService, authManager)
 
     @Provides
     @Singleton

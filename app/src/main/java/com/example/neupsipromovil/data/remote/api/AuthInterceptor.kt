@@ -20,12 +20,15 @@ class AuthInterceptor @Inject constructor(
         // If is a login call doesnt add the bearer
         val isLoginCall = original.url.encodedPath.contains("/auth/login")
 
+        val hasNoAuthHeader = original.header("No-Authentication") != null
+
         // ask to the response to be a json
         val builder = original.newBuilder()
             .header("Accept", "application/json")
+            .removeHeader("No-Authentication")
 
         // if is any other call adds the bearer header
-        if (!isLoginCall) {
+        if (!isLoginCall && !hasNoAuthHeader) {
             authManager.getToken()?.let { token ->
                 builder.header("Authorization", "Bearer $token")
             }

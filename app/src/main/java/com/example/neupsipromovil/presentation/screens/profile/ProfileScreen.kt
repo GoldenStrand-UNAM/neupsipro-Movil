@@ -2,9 +2,11 @@ package com.example.neupsipromovil.presentation.screens.profile
 
 import android.app.Activity
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -37,9 +39,18 @@ import java.util.Locale
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import com.example.neupsipromovil.presentation.common.molecules.HeaderIconButton
+import com.example.neupsipromovil.presentation.common.organisms.LogoutConfirmationModal
+import com.example.neupsipromovil.presentation.common.organisms.MainAppBottomBar
 
 @Composable
 fun ProfileScreen(
@@ -48,6 +59,7 @@ fun ProfileScreen(
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
+    var showLogoutModal by remember { mutableStateOf(false) }
     LaunchedEffect(key1 = userId) {
         viewModel.getProfile(userId)
     }
@@ -67,7 +79,14 @@ fun ProfileScreen(
             AccessibilityButton(onClick = { /*Logica de accesibilidad*/ })
         },
         bottomBar = {
-            // Implementar el Navbar aqui cuando este  completo
+            MainAppBottomBar(
+                currentScreen = "perfil",
+                onNavigate = { screen ->
+                    if (screen == "foro") {
+                        /*TODO: Ir al foro*/
+                    }
+                }
+            )
         }
     ) { paddingValues ->
         Box(
@@ -112,6 +131,24 @@ fun ProfileScreen(
                                         image = user.profilePhoto,
                                         stage = user.stage
                                     )
+                                    Row(
+                                        modifier = Modifier
+                                            .align(Alignment.TopEnd)
+                                            .padding(top = 0.dp, end = 4.dp),
+                                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        HeaderIconButton(
+                                            icon = Icons.AutoMirrored.Filled.HelpOutline,
+                                            contentDescription = "Ayuda",
+                                            onClick = { /*TODO implementar ayuda*/}
+                                        )
+                                        HeaderIconButton(
+                                            icon = Icons.AutoMirrored.Filled.ExitToApp,
+                                            contentDescription  = "Cerrar sesión",
+                                            onClick = { showLogoutModal = true }
+                                        )
+                                    }
                                 }
                             }
                             item {
@@ -162,6 +199,19 @@ fun ProfileScreen(
                         }
                     }
                 }
+            if (showLogoutModal) {
+                LogoutConfirmationModal(
+                    onDismiss = { showLogoutModal = false },
+                    onConfirm = {
+                        showLogoutModal = false
+                        viewModel.logout(onSuccessLogout = {
+                            navController.navigate("login") {
+                                popUpTo(0) { inclusive = true }
+                            }
+                        })
+                    }
+                )
             }
         }
     }
+}
