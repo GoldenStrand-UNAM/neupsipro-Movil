@@ -1,6 +1,7 @@
 package com.example.neupsipromovil.presentation.screens.profile
 
 import android.app.Activity
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -46,11 +47,13 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 import com.example.neupsipromovil.presentation.common.molecules.HeaderIconButton
 import com.example.neupsipromovil.presentation.common.organisms.LogoutConfirmationModal
 import com.example.neupsipromovil.presentation.common.organisms.MainAppBottomBar
+import com.example.neupsipromovil.presentation.navegation.Screen
 
 @Composable
 fun ProfileScreen(
@@ -59,6 +62,7 @@ fun ProfileScreen(
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
+    val context = LocalContext.current
     var showLogoutModal by remember { mutableStateOf(false) }
     LaunchedEffect(key1 = userId) {
         viewModel.getProfile(userId)
@@ -76,14 +80,20 @@ fun ProfileScreen(
 
     Scaffold(
         floatingActionButton = {
-            AccessibilityButton(onClick = { /*Logica de accesibilidad*/ })
+            AccessibilityButton(onClick = {
+                Toast.makeText(context, "Funcionalidad por implementar", Toast.LENGTH_SHORT).show()
+            })
         },
         bottomBar = {
             MainAppBottomBar(
                 currentScreen = "perfil",
                 onNavigate = { screen ->
                     if (screen == "foro") {
-                        /*TODO: Ir al foro*/
+                        navController.navigate(Screen.Forum.createRoute(userId)) {
+                            popUpTo(navController.graph.startDestinationId) {saveState = true }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
                     }
                 }
             )
@@ -141,7 +151,9 @@ fun ProfileScreen(
                                         HeaderIconButton(
                                             icon = Icons.AutoMirrored.Filled.HelpOutline,
                                             contentDescription = "Ayuda",
-                                            onClick = { /*TODO implementar ayuda*/}
+                                            onClick = {
+                                                Toast.makeText(context, "Funcionalidad por implementar", Toast.LENGTH_SHORT).show()
+                                            }
                                         )
                                         HeaderIconButton(
                                             icon = Icons.AutoMirrored.Filled.ExitToApp,
@@ -205,7 +217,7 @@ fun ProfileScreen(
                     onConfirm = {
                         showLogoutModal = false
                         viewModel.logout(onSuccessLogout = {
-                            navController.navigate("login") {
+                            navController.navigate(Screen.Login.route) {
                                 popUpTo(0) { inclusive = true }
                             }
                         })

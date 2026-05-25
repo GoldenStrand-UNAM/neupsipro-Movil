@@ -91,7 +91,7 @@ fun LoginScreen(
                 )
                 Column {
                     AppText(
-                        text = "Neupsi-Pro",
+                        text = "Golondrina",
                         style = AppTypography.titleM,
                         color = White,
                     )

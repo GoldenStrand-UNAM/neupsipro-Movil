@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavType
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
+import com.example.neupsipromovil.presentation.screens.forum.ForumScreen
 import com.example.neupsipromovil.presentation.screens.profile.ProfileScreen
 
 // Rutas
@@ -23,6 +24,9 @@ sealed class Screen(val route: String) {
     object Home : Screen("home")
     object Profile: Screen("profile/{userId}") {
         fun createRoute(userId: String) = "profile/$userId"
+    }
+    object Forum : Screen("forum/{userId}") {
+        fun createRoute(userId: String) = "forum/$userId"
     }
 }
 
@@ -93,6 +97,23 @@ fun NeuNavGraph(
             }
 
             ProfileScreen(userId = userId, navController = navController)
+        }
+
+        composable(
+            route = Screen.Forum.route,
+            arguments = listOf(navArgument("userId") {
+                type = NavType.StringType
+                defaultValue = "u-016"
+            })
+        ) { backStackEntry ->
+            val argumentId = backStackEntry.arguments?.getString("userId")
+            val userId = if (argumentId == "{userId}" || argumentId == "u-016") {
+                loginViewModel.getLoggedInUserId() ?: "u-016"
+            } else {
+                argumentId ?: "u-016"
+            }
+
+            ForumScreen(navController = navController, userId = userId)
         }
     }
 }
