@@ -173,7 +173,7 @@ fun ProfileScreen(
 
                                     ClinicalInfoCard(
                                         age = user.age,
-                                        unitEntryDate = user.unitEntryDate,
+                                        unitEntryDate = user.registrationDate,
                                         neuroEntryDate = user.neuroEntryDate
                                     )
 

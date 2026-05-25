@@ -22,7 +22,7 @@ data class PersonalInfoDto(
 )
 
 data class ClinicalInfoDto(
-    @SerializedName("unitEntryDate") val unitEntryDate: String?,
+    @SerializedName("registrationDate") val registrationDate: String?,
     @SerializedName("neuroEntryDate") val neuroEntryDate: String?,
     @SerializedName("neuroStatus") val neuroStatus: String?,
     @SerializedName("protocol") val protocol: String?,

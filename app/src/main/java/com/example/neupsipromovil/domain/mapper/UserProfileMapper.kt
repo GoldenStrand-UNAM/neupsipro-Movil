@@ -13,7 +13,7 @@ fun UserProfileResponse.toDomain(): UserProfile {
         age = info.personalInfo.age,
         stage = info.clinicalInfo.stage ?: "Sin etapa",
         neuroStatus = info.clinicalInfo.neuroStatus ?: "Desconocido",
-        unitEntryDate = info.clinicalInfo.unitEntryDate ?: "--/--/--",
+        registrationDate = info.clinicalInfo.registrationDate ?: "--/--/--",
         neuroEntryDate = info.clinicalInfo.neuroEntryDate ?: "--/--/--",
         nextAppointmentDate = info.nextAppointment?.date,
         nextAppointmentTime = info.nextAppointment?.time,
