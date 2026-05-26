@@ -21,6 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+@Suppress("ktlint:standard:function-naming")
 @Composable
 fun UsernamePostMolecule(
     modifier: Modifier = Modifier,
@@ -66,6 +67,7 @@ fun UsernamePostMolecule(
     }
 }
 
+@Suppress("ktlint:standard:function-naming")
 @Preview(showBackground = true)
 @Composable
 fun PostHeaderPreview() {

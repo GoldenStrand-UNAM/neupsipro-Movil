@@ -9,10 +9,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Warning
@@ -33,36 +33,40 @@ import androidx.compose.ui.window.Dialog
 import com.example.neupsipromovil.presentation.common.atoms.RedButton
 import com.example.neupsipromovil.presentation.common.atoms.SecondaryOutlineButton
 
+@Suppress("ktlint:standard:function-naming")
 @Composable
 fun LogoutConfirmationModal(
     onDismiss: () -> Unit,
-    onConfirm: () -> Unit
+    onConfirm: () -> Unit,
 ) {
     Dialog(onDismissRequest = onDismiss) {
         Card(
             shape = RoundedCornerShape(24.dp),
             colors = CardDefaults.cardColors(containerColor = Color.White),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Box(
-                    modifier = Modifier
-                        .size(64.dp)
-                        .background(Color(0xFFFFEAEA), shape = CircleShape),
-                    contentAlignment = Alignment.Center
+                    modifier =
+                        Modifier
+                            .size(64.dp)
+                            .background(Color(0xFFFFEAEA), shape = CircleShape),
+                    contentAlignment = Alignment.Center,
                 ) {
                     Icon(
                         imageVector = Icons.Default.Warning,
                         contentDescription = null,
                         tint = Color(0xFFEF4444),
-                        modifier = Modifier.size(32.dp)
+                        modifier = Modifier.size(32.dp),
                     )
                 }
 
@@ -74,7 +78,7 @@ fun LogoutConfirmationModal(
                     fontWeight = FontWeight.Bold,
                     color = Color.Black,
                     textAlign = TextAlign.Center,
-                    lineHeight = 20.sp
+                    lineHeight = 20.sp,
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -85,7 +89,7 @@ fun LogoutConfirmationModal(
                     color = Color.Gray,
                     textAlign = TextAlign.Center,
                     lineHeight = 20.sp,
-                    modifier = Modifier.padding(horizontal = 8.dp)
+                    modifier = Modifier.padding(horizontal = 8.dp),
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -93,18 +97,18 @@ fun LogoutConfirmationModal(
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     SecondaryOutlineButton(
                         text = "Cancelar",
                         onClick = onDismiss,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
                     )
                     RedButton(
                         text = "Cerrar sesión",
                         onClick = onConfirm,
                         icon = Icons.AutoMirrored.Filled.ExitToApp,
-                        modifier = Modifier.weight(1.2f)
+                        modifier = Modifier.weight(1.2f),
                     )
                 }
             }
@@ -112,13 +116,14 @@ fun LogoutConfirmationModal(
     }
 }
 
+@Suppress("ktlint:standard:function-naming")
 @Preview(name = "Modal Organism Preview", showBackground = true, widthDp = 360, heightDp = 640)
 @Composable
 fun ModalPreview() {
     Box(modifier = Modifier.fillMaxSize()) {
         LogoutConfirmationModal(
             onDismiss = {},
-            onConfirm = {}
+            onConfirm = {},
         )
     }
 }

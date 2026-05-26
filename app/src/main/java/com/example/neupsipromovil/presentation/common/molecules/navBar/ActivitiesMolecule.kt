@@ -24,10 +24,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.app.neupsiproMovil.R
 
+@Suppress("ktlint:standard:function-naming")
 @Composable
-fun ActividadesMolecula(
-    modifier: Modifier = Modifier,
-) {
+fun ActividadesMolecula(modifier: Modifier = Modifier) {
     Column(
         modifier =
         modifier,
@@ -81,6 +80,7 @@ fun ActividadesMolecula(
     }
 }
 
+@Suppress("ktlint:standard:function-naming")
 @Preview(showBackground = true)
 @Composable
 fun ActividadesMoleculaPreview() {

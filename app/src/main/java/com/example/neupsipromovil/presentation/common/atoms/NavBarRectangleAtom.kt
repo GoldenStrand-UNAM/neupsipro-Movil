@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
+@Suppress("ktlint:standard:function-naming")
 @Composable
 fun NavBarRectangleAtom(
     modifier: Modifier = Modifier,
@@ -29,6 +30,7 @@ fun NavBarRectangleAtom(
     }
 }
 
+@Suppress("ktlint:standard:function-naming")
 @Preview(showBackground = true)
 @Composable
 fun NavBarRectangleAtomPreview() {

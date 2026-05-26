@@ -26,40 +26,41 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
-
-
-    //host
+    @Suppress("ktlint:standard:property-naming")
+    // host
     private const val url = "http://10.0.2.2:3000/"
 
     // Encrypted prefs for storing the JWT
     @Provides
     @Singleton
     fun provideSharedPreferences(
-        @ApplicationContext context: Context
+        @ApplicationContext context: Context,
     ): SharedPreferences {
-        val masterKey = MasterKey.Builder(context)
-            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-            .build()
+        val masterKey =
+            MasterKey
+                .Builder(context)
+                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                .build()
 
         return EncryptedSharedPreferences.create(
             context,
             "auth_prefs",
             masterKey,
             EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
         )
     }
 
     // OkHttp with auth interceptor added in for every request
     @Provides
     @Singleton
-    fun provideOkHttpClient(
-        authInterceptor: AuthInterceptor
-    ): OkHttpClient{
-        val logging = okhttp3.logging.HttpLoggingInterceptor().apply {
-            level = okhttp3.logging.HttpLoggingInterceptor.Level.BODY
-        }
-        return OkHttpClient.Builder()
+    fun provideOkHttpClient(authInterceptor: AuthInterceptor): OkHttpClient {
+        val logging =
+            okhttp3.logging.HttpLoggingInterceptor().apply {
+                level = okhttp3.logging.HttpLoggingInterceptor.Level.BODY
+            }
+        return OkHttpClient
+            .Builder()
             .addInterceptor(logging)
             .addInterceptor(authInterceptor)
             .connectTimeout(30, TimeUnit.SECONDS)
@@ -70,7 +71,8 @@ object AppModule {
     @Provides
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit =
-        Retrofit.Builder()
+        Retrofit
+            .Builder()
             .baseUrl(url)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
@@ -79,8 +81,7 @@ object AppModule {
     // Build the LoginApiService implementation from the Retrofit
     @Provides
     @Singleton
-    fun provideLoginApiService(retrofit: Retrofit): LoginApiService =
-        retrofit.create(LoginApiService::class.java)
+    fun provideLoginApiService(retrofit: Retrofit): LoginApiService = retrofit.create(LoginApiService::class.java)
 
     // build the LoginRepository to its concrete implementation
     @Provides
@@ -88,16 +89,14 @@ object AppModule {
     fun provideLoginRepository(
         loginApiService: LoginApiService,
         apiService: APIService,
-        authManager: AuthManager
+        authManager: AuthManager,
     ): LoginRepository = LoginRepositoryImpl(loginApiService, apiService, authManager)
 
     @Provides
     @Singleton
-    fun provideApiService(retrofit: Retrofit): APIService =
-        retrofit.create(APIService::class.java)
+    fun provideApiService(retrofit: Retrofit): APIService = retrofit.create(APIService::class.java)
 
     @Provides
     @Singleton
-    fun provideProfileRepository(provideApiService: APIService): ProfileRepository =
-        ProfileRepositoryImpl(provideApiService)
+    fun provideProfileRepository(provideApiService: APIService): ProfileRepository = ProfileRepositoryImpl(provideApiService)
 }

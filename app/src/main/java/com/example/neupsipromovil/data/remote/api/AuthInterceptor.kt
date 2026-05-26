@@ -11,35 +11,38 @@ import javax.inject.Singleton
 */
 
 @Singleton
-class AuthInterceptor @Inject constructor(
-    private val authManager: AuthManager
-) : Interceptor {
+class AuthInterceptor
+    @Inject
+    constructor(
+        private val authManager: AuthManager,
+    ) : Interceptor {
+        override fun intercept(chain: Interceptor.Chain): Response {
+            val original = chain.request()
+            // If is a login call doesn't add the bearer
+            val isLoginCall = original.url.encodedPath.contains("/auth/login")
 
-    override fun intercept(chain: Interceptor.Chain): Response {
-        val original = chain.request()
-        // If is a login call doesnt add the bearer
-        val isLoginCall = original.url.encodedPath.contains("/auth/login")
+            val hasNoAuthHeader = original.header("No-Authentication") != null
 
-        val hasNoAuthHeader = original.header("No-Authentication") != null
+            // ask to the response to be a json
+            val builder =
+                original
+                    .newBuilder()
+                    .header("Accept", "application/json")
+                    .removeHeader("No-Authentication")
 
-        // ask to the response to be a json
-        val builder = original.newBuilder()
-            .header("Accept", "application/json")
-            .removeHeader("No-Authentication")
-
-        // if is any other call adds the bearer header
-        if (!isLoginCall && !hasNoAuthHeader) {
-            authManager.getToken()?.let { token ->
-                builder.header("Authorization", "Bearer $token")
+            // if is any other call adds the bearer header
+            if (!isLoginCall && !hasNoAuthHeader) {
+                authManager.getToken()?.let { token ->
+                    builder.header("Authorization", "Bearer $token")
+                }
             }
-        }
 
-        val response = chain.proceed(builder.build())
+            val response = chain.proceed(builder.build())
 
-        // if the token is not longer valid
-        if (response.code == 401 && !isLoginCall) {
-            authManager.clearSession()
+            // if the token is not longer valid
+            if (response.code == 401 && !isLoginCall) {
+                authManager.clearSession()
+            }
+            return response
         }
-        return response
     }
-}

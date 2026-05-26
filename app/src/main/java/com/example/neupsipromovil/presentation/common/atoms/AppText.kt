@@ -7,6 +7,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import com.example.neupsipromovil.presentation.theme.DarkBlue
 
+@Suppress("ktlint:standard:function-naming")
 @Composable
 fun AppText(
     text: String,

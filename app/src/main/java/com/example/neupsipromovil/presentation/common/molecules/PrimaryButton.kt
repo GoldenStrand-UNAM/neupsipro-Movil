@@ -1,11 +1,10 @@
-package com.example.neupsipromovil.presentation.common.atoms
+package com.example.neupsipromovil.presentation.common.molecules
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
@@ -18,12 +17,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.neupsipromovil.presentation.common.atoms.AppIcon
+import com.example.neupsipromovil.presentation.common.atoms.AppText
+import com.example.neupsipromovil.presentation.common.atoms.IconSize
 import com.example.neupsipromovil.presentation.theme.AppTypography
 import com.example.neupsipromovil.presentation.theme.Blue01
 import com.example.neupsipromovil.presentation.theme.White
-import androidx.compose.foundation.layout.width
 
-
+@Suppress("ktlint:standard:function-naming")
 @Composable
 fun PrimaryButton(
     text: String,
@@ -36,16 +37,18 @@ fun PrimaryButton(
     Button(
         onClick = onClick,
         enabled = enabled && !loading,
-        modifier = modifier
-            .width(233.dp)
-            .height(40.dp),
+        modifier =
+            modifier
+                .width(233.dp)
+                .height(40.dp),
         shape = RoundedCornerShape(8.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Blue01,
-            contentColor = White,
-            disabledContainerColor = Blue01.copy(alpha = 0.5f),
-            disabledContentColor = White,
-        ),
+        colors =
+            ButtonDefaults.buttonColors(
+                containerColor = Blue01,
+                contentColor = White,
+                disabledContainerColor = Blue01.copy(alpha = 0.5f),
+                disabledContentColor = White,
+            ),
     ) {
         if (loading) {
             CircularProgressIndicator(
@@ -59,7 +62,12 @@ fun PrimaryButton(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 leadingIcon?.let {
-                    AppIcon(imageVector = it, contentDescription = null, size = IconSize.Small, tint = White)
+                    AppIcon(
+                        imageVector = it,
+                        contentDescription = null,
+                        size = IconSize.Small,
+                        tint = White
+                    )
                 }
                 AppText(text = text, style = AppTypography.buttonLabel, color = White)
             }
@@ -67,6 +75,7 @@ fun PrimaryButton(
     }
 }
 
+@Suppress("ktlint:standard:function-naming")
 @Preview(showBackground = true)
 @Composable
 private fun PrimaryButtonPreview() {

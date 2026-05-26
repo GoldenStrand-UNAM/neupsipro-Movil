@@ -16,24 +16,26 @@ import androidx.compose.ui.unit.dp
 import com.example.neupsipromovil.presentation.common.atoms.DateBadge
 import com.example.neupsipromovil.presentation.common.molecules.profile.AppointmentContent
 
+@Suppress("ktlint:standard:function-naming")
 @Composable
 fun AppointmentCard(
     month: String,
     day: String,
     title: String,
     time: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     OutlinedCard(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
     ) {
         Row(
-            modifier = Modifier
-                .padding(12.dp)
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+            modifier =
+                Modifier
+                    .padding(12.dp)
+                    .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             DateBadge(month = month, day = day)
             Spacer(modifier = Modifier.width(12.dp))

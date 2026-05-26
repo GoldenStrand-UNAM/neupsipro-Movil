@@ -16,37 +16,38 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.app.neupsiproMovil.R
 
-
+@Suppress("ktlint:standard:function-naming")
 @Composable
 fun ProfileAvatar(
     image: String?,
     modifier: Modifier = Modifier,
-    size: Dp = 120.dp
+    size: Dp = 120.dp,
 ) {
     Surface(
         modifier = modifier.size(size),
         shape = CircleShape,
         color = MaterialTheme.colorScheme.surfaceVariant,
-        tonalElevation = 2.dp
+        tonalElevation = 2.dp,
     ) {
         AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(image)
-                .crossfade(true)
-                .listener(
-                    onStart = { println("DEBUG_S3: Iniciando carga de imagen...") },
-                    onSuccess = { _, _ -> println("DEBUG_S3: ¡Imagen cargada con éxito!") },
-                    onError = { _, result ->
-                        println("DEBUG_S3: Error al cargar imagen. Causa: ${result.throwable}")
-                        // Esto te dirá si es un 403 Forbidden, 404 Not Found, etc.
-                    }
-                )
-                .build(),
+            model =
+                ImageRequest
+                    .Builder(LocalContext.current)
+                    .data(image)
+                    .crossfade(true)
+                    .listener(
+                        onStart = { println("DEBUG_S3: Iniciando carga de imagen...") },
+                        onSuccess = { _, _ -> println("DEBUG_S3: ¡Imagen cargada con éxito!") },
+                        onError = { _, result ->
+                            println("DEBUG_S3: Error al cargar imagen. Causa: ${result.throwable}")
+                            // Esto te dirá si es un 403 Forbidden, 404 Not Found, etc.
+                        },
+                    ).build(),
             contentDescription = "Foto de Perfil",
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize(),
             placeholder = painterResource(R.drawable.default_avatar),
-            error = painterResource(R.drawable.default_avatar)
+            error = painterResource(R.drawable.default_avatar),
         )
     }
 }

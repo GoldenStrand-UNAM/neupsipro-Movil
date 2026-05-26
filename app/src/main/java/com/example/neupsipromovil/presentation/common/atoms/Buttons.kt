@@ -27,10 +27,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+@Suppress("ktlint:standard:function-naming")
 @Composable
 fun AccessibilityButton(
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     ExtendedFloatingActionButton(
         onClick = onClick,
@@ -39,65 +40,68 @@ fun AccessibilityButton(
         contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         shape = CircleShape,
         icon = { Icon(Icons.Default.Accessibility, contentDescription = null) },
-        text = { Text(text = "Accesibilidad") }
+        text = { Text(text = "Accesibilidad") },
     )
 }
 
+@Suppress("ktlint:standard:function-naming")
 @Composable
 fun RedButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    icon: ImageVector? = null
+    icon: ImageVector? = null,
 ) {
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444)),
         shape = RoundedCornerShape(8.dp),
         contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
-        modifier = modifier
+        modifier = modifier,
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ){
+            horizontalArrangement = Arrangement.Center,
+        ) {
             if (icon != null) {
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
                     tint = Color.White,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(20.dp),
                 )
                 Spacer(modifier = Modifier.width(6.dp))
             }
             Text(
                 text = text,
-                color = Color.White, fontSize = 14.sp,
+                color = Color.White,
+                fontSize = 14.sp,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
             )
         }
     }
 }
 
+@Suppress("ktlint:standard:function-naming")
 @Composable
 fun SecondaryOutlineButton(
     text: String,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     OutlinedButton(
         onClick = onClick,
         border = BorderStroke(1.dp, Color.LightGray),
         shape = RoundedCornerShape(8.dp),
-        modifier = modifier
+        modifier = modifier,
     ) {
         Text(
             text = text,
             color = Color.Black,
             fontSize = 14.sp,
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis
+            overflow = TextOverflow.Ellipsis,
         )
     }
 }

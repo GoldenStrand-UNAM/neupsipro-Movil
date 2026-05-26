@@ -15,16 +15,17 @@ import androidx.compose.ui.unit.dp
 import com.example.neupsipromovil.presentation.common.atoms.ProfileAvatar
 import com.example.neupsipromovil.presentation.common.atoms.StatusTag
 
+@Suppress("ktlint:standard:function-naming")
 @Composable
 fun ProfileHeader(
     fullName: String,
     stage: String,
     image: String?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         ProfileAvatar(image = image, size = 100.dp)
         Spacer(modifier = Modifier.height(12.dp))
@@ -32,11 +33,11 @@ fun ProfileHeader(
             text = fullName,
             style = MaterialTheme.typography.headlineMedium,
             color = Color.White,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
         )
         StatusTag(
             status = stage,
-            color = Color.White
+            color = Color.White,
         )
     }
 }

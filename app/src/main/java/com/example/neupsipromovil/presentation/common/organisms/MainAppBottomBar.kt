@@ -16,36 +16,39 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.neupsipromovil.presentation.common.molecules.navBar.BottomNavItem
 
+@Suppress("ktlint:standard:function-naming")
 @Composable
 fun MainAppBottomBar(
     currentScreen: String,
-    onNavigate: (String) -> Unit
+    onNavigate: (String) -> Unit,
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(72.dp)
-            .background(Color.White),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .height(72.dp)
+                .background(Color.White),
         horizontalArrangement = Arrangement.SpaceAround,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         BottomNavItem(
             icon = Icons.Default.Forum,
             label = "Foro",
             isSelected = currentScreen == "foro",
             onClick = { onNavigate("foro") },
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
         )
         BottomNavItem(
             icon = Icons.Default.Person,
             label = "Perfil",
             isSelected = currentScreen == "perfil",
             onClick = { onNavigate("perfil") },
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
         )
     }
 }
 
+@Suppress("ktlint:standard:function-naming")
 @Preview(name = "Atoms & Molecules Preview", showBackground = true)
 @Composable
 fun ComponentsPreview() {
