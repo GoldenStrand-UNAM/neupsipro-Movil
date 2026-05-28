@@ -28,7 +28,7 @@ import javax.inject.Singleton
 object AppModule {
     @Suppress("ktlint:standard:property-naming")
     // host
-    private const val url = "http://10.25.89.194:3000/"
+    private const val url = "http://banu.com.mx/"
 
     // Encrypted prefs for storing the JWT
     @Provides
