@@ -14,34 +14,35 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
+@Suppress("ktlint:standard:function-naming")
 @Composable
 fun DateBadge(
     month: String,
     day: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Surface(
         modifier = modifier.size(width = 51.dp, height = 51.dp),
         shape = RoundedCornerShape(12.dp),
         color = MaterialTheme.colorScheme.primaryContainer,
-        tonalElevation = 2.dp
+        tonalElevation = 2.dp,
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
-            modifier = Modifier.padding(4.dp)
+            modifier = Modifier.padding(4.dp),
         ) {
             Text(
                 text = month.uppercase(),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
             )
             Text(
                 text = day,
                 style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
-                fontWeight = FontWeight.ExtraBold
+                fontWeight = FontWeight.ExtraBold,
             )
         }
     }

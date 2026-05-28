@@ -8,6 +8,7 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
+import org.junit.Assert.assertFalse
 import org.junit.Before
 import org.junit.Test
 import retrofit2.Retrofit
@@ -67,7 +68,7 @@ class APIServiceTest {
                                     "age": 30
                                 },
                                 "clinicalInfo": {
-                                    "unitEntryDate": "2024-01-15",
+                                    "registrationDate": "2024-01-15",
                                     "neuroEntryDate": "2024-01-20",
                                     "neuroStatus": "Active",
                                     "protocol": "P001",
@@ -103,7 +104,7 @@ class APIServiceTest {
             assertEquals(30, response.data.personalInfo.age)
 
             // THEN: ClinicalInfo fields parsed correctly
-            assertEquals("2024-01-15", response.data.clinicalInfo.unitEntryDate)
+            assertEquals("2024-01-15", response.data.clinicalInfo.registrationDate)
             assertEquals("2024-01-20", response.data.clinicalInfo.neuroEntryDate)
             assertEquals("Active", response.data.clinicalInfo.neuroStatus)
             assertEquals("P001", response.data.clinicalInfo.protocol)
@@ -319,5 +320,53 @@ class APIServiceTest {
             val path = recordedRequest.path ?: ""
             assertTrue("Token must not appear in the URL path", !path.contains("Bearer"))
             assertTrue("Password must not appear in the URL", !path.contains("password"))
+        }
+    @Test
+    fun `logout request hits the correct endpoint with proper headers and returns 200`() =
+        runTest {
+            //GIVEN: Server responds with 200 OK
+            mockWebServer.enqueue(
+                MockResponse()
+                    .setResponseCode(200)
+                    .addHeader("Content-Type", "application/json")
+            )
+
+            //WHEN: Execute logout w/mock token
+            val response = apiService.logout(authHeader = "Bearer mi-token-123")
+
+            //THEN: verify response success
+            assertTrue(response.isSuccessful)
+            assertEquals(200, response.code())
+            val recordedRequest = mockWebServer.takeRequest()
+            assertEquals("/auth/logout", recordedRequest.path)
+            assertEquals("POST", recordedRequest.method)
+            assertEquals("Bearer mi-token-123", recordedRequest.getHeader("Authorization"))
+            assertEquals("true", recordedRequest.getHeader("No-Authentication"))
+            assertEquals("application/json", recordedRequest.getHeader("Content-Type"))
+        }
+    @Test
+    fun `logout when token is already expired returns 401 unsuccessful response`() =
+        runTest {
+            //GIVEN: Server throws 401
+            mockWebServer.enqueue(MockResponse().setResponseCode(401))
+
+            //WHEN: Try logout with expired token
+            val response = apiService.logout(authHeader = "Bearer token expirado")
+
+            //THEN: response False & 401
+            assertFalse(response.isSuccessful)
+            assertEquals(401, response.code())
+        }
+    @Test
+    fun `logout when server fails return 500 unsuccessful response`() =
+        runTest {
+            mockWebServer.enqueue(MockResponse().setResponseCode(500))
+
+            //WHEN: Try logout
+            val response = apiService.logout(authHeader = "Bearer mi-token-123")
+
+            //THEN: response failed
+            assertFalse(response.isSuccessful)
+            assertEquals(500, response.code())
         }
 }

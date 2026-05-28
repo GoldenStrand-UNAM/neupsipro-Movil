@@ -18,12 +18,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.neupsipromovil.presentation.common.molecules.post.UsernamePostMolecule
 
+@Suppress("ktlint:standard:function-naming")
 @Composable
 fun PostOrganism(
     modifier: Modifier = Modifier,
     username: String = "Username",
     avatarLetter: String = "U",
-    title: String ="Titulo del Post",
+    title: String = "Titulo del Post",
     body: String = "Cuerpo del Post",
 ) {
     Column(
@@ -74,14 +75,14 @@ fun PostOrganism(
     }
 }
 
+@Suppress("ktlint:standard:function-naming")
 @Preview(showBackground = true)
 @Composable
 fun PostOrganismPreview() {
     PostOrganism(
         username = "Username",
         avatarLetter = "U",
-        title ="BUENOS DIASSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+        title = "BUENOS DIASSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
         body = "HOLAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
     )
-
 }

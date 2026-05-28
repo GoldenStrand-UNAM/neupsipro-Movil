@@ -2,6 +2,7 @@ package com.example.neupsipromovil.presentation.screens.profile
 
 import com.example.neupsipromovil.domain.model.UserProfile
 import com.example.neupsipromovil.domain.usecase.user.GetUserProfileUseCase
+import com.example.neupsipromovil.domain.usecase.login.LogoutUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -21,6 +22,7 @@ class ProfileViewModelTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     private val testDispatcher = UnconfinedTestDispatcher()
     private lateinit var getUserProfileUseCase: GetUserProfileUseCase
+    private lateinit var logoutUseCase: LogoutUseCase
     private lateinit var viewModel: ProfileViewModel
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -29,7 +31,8 @@ class ProfileViewModelTest {
         // Replace Main dispatcher — JVM has no Main thread
         Dispatchers.setMain(testDispatcher)
         getUserProfileUseCase = mock()
-        viewModel = ProfileViewModel(getUserProfileUseCase)
+        logoutUseCase = mock()
+        viewModel = ProfileViewModel(getUserProfileUseCase, logoutUseCase)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -70,7 +73,7 @@ class ProfileViewModelTest {
                     age = 30,
                     stage = "Stand By",
                     neuroStatus = "Active",
-                    unitEntryDate = "2024-01-15",
+                    registrationDate = "2024-01-15",
                     neuroEntryDate = "2024-01-20",
                     nextAppointmentDate = "2024-06-15",
                     nextAppointmentTime = "10:00 AM",
@@ -186,7 +189,7 @@ class ProfileViewModelTest {
                     age = 0,
                     stage = "",
                     neuroStatus = "",
-                    unitEntryDate = "",
+                    registrationDate = "",
                     neuroEntryDate = "",
                     nextAppointmentDate = null,
                     nextAppointmentTime = null,
@@ -214,4 +217,40 @@ class ProfileViewModelTest {
             assertNull(state.error)
             assertFalse(state.isLoading)
         }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `logout success triggers callback and update state`() = runTest {
+        // GIVEN: logout useCase responds with success
+        whenever(logoutUseCase.invoke()).thenReturn(Result.success(Unit))
+        var callbackCalled = false
+
+        //WHEN: Logging out
+        viewModel.logout(onSuccessLogout = { callbackCalled = true})
+        advanceUntilIdle()
+
+        //THEN :callback executed & state changes correctly
+        assertTrue(callbackCalled)
+        assertFalse(viewModel.state.value.isLoading)
+        assertNull(viewModel.state.value.error)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `logout failure stores error message in state`() = runTest {
+        //GIVEN: UseCase fails with exception
+        val errorMessage = "Error de red al cerrar sesión"
+        whenever(logoutUseCase.invoke()).thenReturn(Result.failure(Exception(errorMessage)))
+        var callbackCalled = false
+
+        //WHEN: try logout
+        viewModel.logout(onSuccessLogout = { callbackCalled = true})
+        advanceUntilIdle()
+
+        //THEN: Callback isnt called & error is stored in UI state
+        assertFalse(callbackCalled)
+        assertFalse(viewModel.state.value.isLoading)
+        assertEquals(errorMessage, viewModel.state.value.error)
+    }
+
 }

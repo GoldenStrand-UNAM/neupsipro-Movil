@@ -18,24 +18,27 @@ import com.example.neupsipromovil.presentation.common.atoms.IconSize
 import com.example.neupsipromovil.presentation.theme.Gold
 import com.example.neupsipromovil.presentation.theme.White
 
+@Suppress("ktlint:standard:function-naming")
 @Composable
 fun HelpBadge(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(
-        modifier = modifier
-            .size(51.dp)
-            .clip(CircleShape)
-            .background(Gold)
-            .clickable(onClick = onClick),
+        modifier =
+            modifier
+                .size(51.dp)
+                .clip(CircleShape)
+                .background(Gold)
+                .clickable(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         Box(
-            modifier = Modifier
-                .size(24.dp)
-                .clip(CircleShape)
-                .background(White),
+            modifier =
+                Modifier
+                    .size(24.dp)
+                    .clip(CircleShape)
+                    .background(White),
             contentAlignment = Alignment.Center,
         ) {
             AppIcon(
@@ -48,6 +51,9 @@ fun HelpBadge(
     }
 }
 
+@Suppress("ktlint:standard:function-naming")
 @Preview(showBackground = true, backgroundColor = 0xFF3F51B5)
 @Composable
-private fun HelpBadgePreview() { HelpBadge(onClick = {}) }
+private fun HelpBadgePreview() {
+    HelpBadge(onClick = {})
+}

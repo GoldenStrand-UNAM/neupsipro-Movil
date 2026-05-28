@@ -18,24 +18,25 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.neupsipromovil.presentation.common.molecules.profile.InfoRow
 
+@Suppress("ktlint:standard:function-naming")
 @Composable
 fun ClinicalInfoCard(
     age: Int,
     unitEntryDate: String,
     neuroEntryDate: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     ElevatedCard(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface)
+        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
                 text = "Información Personal",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 8.dp)
+                modifier = Modifier.padding(bottom = 8.dp),
             )
             InfoRow(icon = Icons.Default.Cake, label = "Edad", value = "$age años")
             InfoRow(icon = Icons.AutoMirrored.Filled.Login, label = "Fecha de Ingreso unidad:", value = unitEntryDate)

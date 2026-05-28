@@ -6,7 +6,7 @@ data class UserProfile(
     val age: Int,
     val stage: String,
     val neuroStatus: String,
-    val unitEntryDate: String,
+    val registrationDate: String,
     val neuroEntryDate: String,
     val nextAppointmentDate: String?,
     val nextAppointmentTime: String?,

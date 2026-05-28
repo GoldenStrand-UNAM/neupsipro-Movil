@@ -12,11 +12,12 @@ import androidx.compose.ui.unit.dp
 import com.example.neupsipromovil.presentation.theme.Grey
 
 object IconSize {
-    val Small: Dp  = 16.dp
+    val Small: Dp = 16.dp
     val Medium: Dp = 20.dp
-    val Large: Dp  = 24.dp
+    val Large: Dp = 24.dp
 }
 
+@Suppress("ktlint:standard:function-naming")
 @Composable
 fun AppIcon(
     painter: Painter,
@@ -33,6 +34,7 @@ fun AppIcon(
     )
 }
 
+@Suppress("ktlint:standard:function-naming")
 @Composable
 fun AppIcon(
     imageVector: ImageVector,

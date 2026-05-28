@@ -24,11 +24,11 @@ import com.example.neupsipromovil.presentation.common.atoms.AppIcon
 import com.example.neupsipromovil.presentation.common.atoms.AppText
 import com.example.neupsipromovil.presentation.common.atoms.IconSize
 import com.example.neupsipromovil.presentation.theme.AppTypography
-import com.example.neupsipromovil.presentation.theme.Blue01
-import com.example.neupsipromovil.presentation.theme.DarkBlue
-import com.example.neupsipromovil.presentation.theme.Grey
 import com.example.neupsipromovil.presentation.theme.Black
+import com.example.neupsipromovil.presentation.theme.Blue01
+import com.example.neupsipromovil.presentation.theme.Grey
 
+@Suppress("ktlint:standard:function-naming")
 @Composable
 fun InputTextField(
     label: String,
@@ -42,9 +42,10 @@ fun InputTextField(
     keyboardType: KeyboardType = KeyboardType.Text,
 ) {
     Column(
-        modifier = modifier
-            .widthIn(max = 306.dp)
-            .height(86.dp),
+        modifier =
+            modifier
+                .widthIn(max = 306.dp)
+                .height(86.dp),
     ) {
         AppText(text = label, style = AppTypography.labelBase, color = Black)
         Spacer(Modifier.height(6.dp))
@@ -67,17 +68,20 @@ fun InputTextField(
             visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
             keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
             shape = RoundedCornerShape(8.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Blue01,
-                unfocusedBorderColor = Grey.copy(alpha = 0.3f),
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(min = 56.dp),
+            colors =
+                OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Blue01,
+                    unfocusedBorderColor = Grey.copy(alpha = 0.3f),
+                ),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 56.dp),
         )
     }
 }
 
+@Suppress("ktlint:standard:function-naming")
 @Preview(showBackground = true)
 @Composable
 private fun InputTextFieldPreview() {
