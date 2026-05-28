@@ -32,10 +32,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.app.neupsiproMovil.R
 import com.example.neupsipromovil.presentation.common.atoms.AppText
-import com.example.neupsipromovil.presentation.common.molecules.PrimaryButton
-import com.example.neupsipromovil.presentation.common.molecules.SecondaryButton
 import com.example.neupsipromovil.presentation.common.molecules.HelpBadge
 import com.example.neupsipromovil.presentation.common.molecules.InputTextField
+import com.example.neupsipromovil.presentation.common.molecules.PrimaryButton
+import com.example.neupsipromovil.presentation.common.molecules.SecondaryButton
 import com.example.neupsipromovil.presentation.theme.AppTypography
 import com.example.neupsipromovil.presentation.theme.Blue01
 import com.example.neupsipromovil.presentation.theme.LightBlue
@@ -102,14 +102,6 @@ fun LoginScreen(
                     )
                 }
             }
-            HelpBadge(
-                onClick = { /* TODO: open help */ },
-                modifier =
-                    Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(end = 24.dp)
-                        .offset(y = 25.dp),
-            )
         }
 
         Spacer(Modifier.height(88.dp))
