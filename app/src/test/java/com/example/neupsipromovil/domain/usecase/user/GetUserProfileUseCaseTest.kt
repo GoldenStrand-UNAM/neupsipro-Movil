@@ -37,7 +37,7 @@ class GetUserProfileUseCaseTest {
                     age = 30,
                     stage = "Stand By",
                     neuroStatus = "Active",
-                    unitEntryDate = "2024-01-15",
+                    registrationDate = "2024-01-15",
                     neuroEntryDate = "2024-01-20",
                     nextAppointmentDate = "2024-06-15",
                     nextAppointmentTime = "10:00 AM",

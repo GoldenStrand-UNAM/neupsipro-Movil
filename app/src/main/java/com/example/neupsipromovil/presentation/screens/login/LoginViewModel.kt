@@ -52,7 +52,7 @@ class LoginViewModel @Inject constructor(
         "EMPTY_FIELDS" -> "El usuario y la contraseña son obligatorios"
         "INVALID_LENGTH" -> "Máximo 30 caracteres"
         "INVALID_CREDENTIALS" -> "Credenciales inválidas"
-        "USER_DISABLED" -> "Esta cuenta no esta  desactivada"
+        "USER_DISABLED" -> " Esta cuenta no esta  desactivada"
         "TOO_MANY_REQUESTS" -> "Demasiados intentos. Intenta más tarde"
         "NETWORK_ERROR" -> "Error de conexión"
         else -> "Error inesperado"
