@@ -151,6 +151,9 @@ fun ProfileScreen(
 
                     state.user != null -> {
                         val user = state.user!!
+                        val hasAppointment = user.nextAppointmentDate != null
+                        val appointmentIndex = if (hasAppointment) 2 else -1
+                        val staffIndex = if (hasAppointment) 3 else 2
 
                         LazyColumn(
                             state = lazyListState,
@@ -226,32 +229,41 @@ fun ProfileScreen(
                                         style = MaterialTheme.typography.titleMedium,
                                         modifier = Modifier.padding(bottom = 8.dp),
                                     )
-                                    user.nextAppointmentDate?.let { dateString ->
-                                        val datePart = dateString.take(10)
-                                        val date = LocalDate.parse(datePart, DateTimeFormatter.ISO_LOCAL_DATE)
-                                        val monthName =
-                                            date.month
-                                                .getDisplayName(
-                                                    java.time.format.TextStyle.SHORT,
-                                                    Locale("es", "MX"),
-                                                ).uppercase()
-                                                .replace(".", "")
-                                        val dayOfMonth = date.dayOfMonth.toString().padStart(2, '0')
-                                        AppointmentCard(
-                                            month = monthName,
-                                            day = dayOfMonth,
-                                            title = "Cita proxima",
-                                            time = user.nextAppointmentTime?.take(5) ?: "--:--",
-                                            modifier =
-                                                Modifier.showcase(
-                                                    index = 2,
-                                                    message =
-                                                        ShowcaseMsg(
-                                                            text = "Esta es la fecha y hora de tu siguiente cita agendada.",
-                                                            textStyle = TextStyle(color = Color.White),
-                                                            gravity = Gravity.Top,
-                                                        ),
-                                                ),
+                                    if (hasAppointment) {
+                                        user.nextAppointmentDate?.let { dateString ->
+                                            val datePart = dateString.take(10)
+                                            val date = LocalDate.parse(datePart, DateTimeFormatter.ISO_LOCAL_DATE)
+                                            val monthName =
+                                                date.month
+                                                    .getDisplayName(
+                                                        java.time.format.TextStyle.SHORT,
+                                                        Locale("es", "MX"),
+                                                    ).uppercase()
+                                                    .replace(".", "")
+                                            val dayOfMonth = date.dayOfMonth.toString().padStart(2, '0')
+                                            AppointmentCard(
+                                                month = monthName,
+                                                day = dayOfMonth,
+                                                title = "Cita proxima",
+                                                time = user.nextAppointmentTime?.take(5) ?: "--:--",
+                                                modifier =
+                                                    Modifier.showcase(
+                                                        index = appointmentIndex,
+                                                        message =
+                                                            ShowcaseMsg(
+                                                                text = "Esta es la fecha y hora de tu siguiente cita agendada.",
+                                                                textStyle = TextStyle(color = Color.White),
+                                                                gravity = Gravity.Top,
+                                                            ),
+                                                    ),
+                                            )
+                                        }
+                                    } else {
+                                        Text(
+                                            text = "No tienes citas programadas.",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = Color.Gray,
+                                            modifier = Modifier.padding(vertical = 8.dp),
                                         )
                                     }
 
@@ -260,7 +272,7 @@ fun ProfileScreen(
                                     Box(
                                         modifier =
                                             Modifier.showcase(
-                                                index = 3,
+                                                index = staffIndex,
                                                 message =
                                                     ShowcaseMsg(
                                                         text = "Aquí encuentras los especialistas asignados a tu caso.",
