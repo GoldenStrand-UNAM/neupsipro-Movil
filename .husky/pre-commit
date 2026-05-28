@@ -1,1 +1,1 @@
-node scripts/check-names.js $(git diff --cached --name-only)
+npm test
