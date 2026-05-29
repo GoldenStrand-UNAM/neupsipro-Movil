@@ -1,5 +1,6 @@
 package com.example.neupsipromovil.presentation.screens.login
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -27,6 +28,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -50,6 +52,7 @@ fun LoginScreen(
     val loginState by viewModel.loginState.collectAsState()
     val username by viewModel.username.collectAsState()
     val password by viewModel.password.collectAsState()
+    val context = LocalContext.current
 
     LaunchedEffect(loginState) {
         if (loginState is LoginUiState.Success) {
@@ -162,7 +165,7 @@ fun LoginScreen(
         ) {
             SecondaryButton(
                 text = "Accesibilidad",
-                onClick = { /* accessibility */ },
+                onClick = { Toast.makeText(context, "Funcionalidad por implementar", Toast.LENGTH_SHORT).show() },
                 leadingIcon = Icons.Default.Accessibility,
             )
         }
