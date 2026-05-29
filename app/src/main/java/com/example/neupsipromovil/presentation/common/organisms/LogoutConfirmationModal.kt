@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -99,21 +98,21 @@ fun LogoutConfirmationModal(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                Row(
+                Column(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalAlignment = Alignment.CenterVertically,
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    SecondaryOutlineButton(
-                        text = "Cancelar",
-                        onClick = onDismiss,
-                        modifier = Modifier.weight(1f),
-                    )
                     RedButton(
                         text = "Cerrar sesión",
                         onClick = onConfirm,
                         icon = Icons.AutoMirrored.Filled.ExitToApp,
-                        modifier = Modifier.weight(1.2f),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    SecondaryOutlineButton(
+                        text = "Cancelar",
+                        onClick = onDismiss,
+                        modifier = Modifier.fillMaxWidth(),
                     )
                 }
             }
