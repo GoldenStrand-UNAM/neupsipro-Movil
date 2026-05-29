@@ -15,7 +15,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,6 +25,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.neupsipromovil.presentation.theme.Blue02
+import com.example.neupsipromovil.presentation.theme.DarkBlue
 
 @Suppress("ktlint:standard:function-naming")
 @Composable
@@ -36,8 +37,8 @@ fun AccessibilityButton(
     ExtendedFloatingActionButton(
         onClick = onClick,
         modifier = modifier,
-        containerColor = MaterialTheme.colorScheme.secondaryContainer,
-        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        containerColor = Blue02,
+        contentColor = DarkBlue,
         shape = CircleShape,
         icon = { Icon(Icons.Default.Accessibility, contentDescription = null) },
         text = { Text(text = "Accesibilidad") },

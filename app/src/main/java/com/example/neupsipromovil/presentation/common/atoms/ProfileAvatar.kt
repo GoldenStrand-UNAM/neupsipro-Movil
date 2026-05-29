@@ -3,7 +3,6 @@ package com.example.neupsipromovil.presentation.common.atoms
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -15,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.app.neupsiproMovil.R
+import com.example.neupsipromovil.presentation.theme.Blue02
 
 @Suppress("ktlint:standard:function-naming")
 @Composable
@@ -26,7 +26,7 @@ fun ProfileAvatar(
     Surface(
         modifier = modifier.size(size),
         shape = CircleShape,
-        color = MaterialTheme.colorScheme.surfaceVariant,
+        color = Blue02,
         tonalElevation = 2.dp,
     ) {
         AsyncImage(
@@ -40,7 +40,6 @@ fun ProfileAvatar(
                         onSuccess = { _, _ -> println("DEBUG_S3: ¡Imagen cargada con éxito!") },
                         onError = { _, result ->
                             println("DEBUG_S3: Error al cargar imagen. Causa: ${result.throwable}")
-                            // Esto te dirá si es un 403 Forbidden, 404 Not Found, etc.
                         },
                     ).build(),
             contentDescription = "Foto de Perfil",

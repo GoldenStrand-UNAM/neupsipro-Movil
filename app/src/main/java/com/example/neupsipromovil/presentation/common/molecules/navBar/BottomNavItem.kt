@@ -18,6 +18,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.neupsipromovil.presentation.theme.Blue01
+import com.example.neupsipromovil.presentation.theme.DarkBlue
 
 @Suppress("ktlint:standard:function-naming")
 @Composable
@@ -43,14 +45,14 @@ fun BottomNavItem(
         Icon(
             imageVector = icon,
             contentDescription = label,
-            tint = if (isSelected) Color(0xFF3F51B5) else Color.Gray,
+            tint = if (isSelected) DarkBlue else Color.Gray,
             modifier = Modifier.size(26.dp),
         )
         Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = label,
             fontSize = 12.sp,
-            color = if (isSelected) Color(0xFF3F51B5) else Color.Gray,
+            color = if (isSelected) Blue01 else Color.Gray,
         )
     }
 }
