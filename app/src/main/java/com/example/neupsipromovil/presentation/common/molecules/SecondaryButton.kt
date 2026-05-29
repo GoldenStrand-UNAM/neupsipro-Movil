@@ -10,15 +10,21 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Accessibility
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.neupsipromovil.presentation.common.atoms.AppIcon
-import com.example.neupsipromovil.presentation.common.atoms.AppText
 import com.example.neupsipromovil.presentation.common.atoms.IconSize
 import com.example.neupsipromovil.presentation.theme.AppTypography
 import com.example.neupsipromovil.presentation.theme.DarkBlue
@@ -32,6 +38,9 @@ fun SecondaryButton(
     modifier: Modifier = Modifier,
     leadingIcon: ImageVector? = null,
 ) {
+    var fontSizeState by remember(text) { mutableStateOf(AppTypography.buttonLabel.fontSize) }
+    var readyToDraw by remember(text) { mutableStateOf(false) }
+
     Row(
         modifier =
             modifier
@@ -40,7 +49,7 @@ fun SecondaryButton(
                 .clip(RoundedCornerShape(12.dp))
                 .background(LightBlue)
                 .clickable(onClick = onClick)
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
     ) {
@@ -52,7 +61,24 @@ fun SecondaryButton(
                 tint = DarkBlue,
             )
         }
-        AppText(text = text, style = AppTypography.buttonLabel, color = DarkBlue)
+        Text(
+            text = text,
+            modifier = Modifier.graphicsLayer(alpha = if (readyToDraw) 1f else 0f),
+            style = AppTypography.buttonLabel.copy(fontSize = fontSizeState),
+            color = DarkBlue,
+            maxLines = 1,
+            onTextLayout = { textLayoutResult ->
+                if (textLayoutResult.hasVisualOverflow) {
+                    if (fontSizeState > 10.sp) {
+                        fontSizeState = fontSizeState * 0.9f
+                    } else {
+                        readyToDraw = true
+                    }
+                } else {
+                    readyToDraw = true
+                }
+            }
+        )
     }
 }
 
