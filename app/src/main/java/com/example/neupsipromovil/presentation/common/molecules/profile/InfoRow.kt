@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.example.neupsipromovil.presentation.common.atoms.InfoLabel
+import com.example.neupsipromovil.presentation.theme.DarkBlue
 
 @Suppress("ktlint:standard:function-naming")
 @Composable
@@ -36,7 +37,7 @@ fun InfoRow(
             imageVector = icon,
             contentDescription = null,
             modifier = Modifier.size(24.dp),
-            tint = MaterialTheme.colorScheme.primary,
+            tint = DarkBlue,
         )
         Spacer(modifier = Modifier.width(16.dp))
         Column {

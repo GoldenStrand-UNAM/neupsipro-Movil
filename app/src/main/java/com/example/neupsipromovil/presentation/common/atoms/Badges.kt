@@ -13,6 +13,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.neupsipromovil.presentation.theme.Black
+import com.example.neupsipromovil.presentation.theme.Blue02
+import com.example.neupsipromovil.presentation.theme.DarkBlue
 
 @Suppress("ktlint:standard:function-naming")
 @Composable
@@ -24,7 +27,7 @@ fun DateBadge(
     Surface(
         modifier = modifier.size(width = 51.dp, height = 51.dp),
         shape = RoundedCornerShape(12.dp),
-        color = MaterialTheme.colorScheme.primaryContainer,
+        color = Blue02,
         tonalElevation = 2.dp,
     ) {
         Column(
@@ -35,13 +38,13 @@ fun DateBadge(
             Text(
                 text = month.uppercase(),
                 style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.primary,
+                color = DarkBlue,
                 fontWeight = FontWeight.Bold,
             )
             Text(
                 text = day,
                 style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                color = Black,
                 fontWeight = FontWeight.ExtraBold,
             )
         }

@@ -175,7 +175,7 @@ fun ProfileScreen(
                                         Modifier
                                             .fillMaxWidth()
                                             .background(
-                                                color = Color(0xFF3F51B5),
+                                                color = Color(0xFF3F50B4),
                                                 shape = RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp),
                                             ).padding(top = statusBarPadding.calculateTopPadding())
                                             .padding(horizontal = 16.dp, vertical = 24.dp),
