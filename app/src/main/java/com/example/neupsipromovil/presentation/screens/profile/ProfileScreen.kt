@@ -155,6 +155,15 @@ fun ProfileScreen(
                         val appointmentIndex = if (hasAppointment) 2 else -1
                         val staffIndex = if (hasAppointment) 3 else 2
 
+                        val translatedStage =
+                            when (user.stage?.lowercase(Locale.ROOT)) {
+                                "evaluation" -> "Evaluación"
+                                "intervention" -> "Intervención"
+                                "graduation" -> "Graduación"
+                                null -> ""
+                                else -> user.stage
+                            }
+
                         LazyColumn(
                             state = lazyListState,
                             modifier = Modifier.fillMaxSize(),
@@ -174,7 +183,7 @@ fun ProfileScreen(
                                     ProfileHeader(
                                         fullName = user.fullName,
                                         image = user.profilePhoto,
-                                        stage = user.stage,
+                                        stage = translatedStage,
                                     )
                                     Row(
                                         modifier =
@@ -233,12 +242,11 @@ fun ProfileScreen(
                                         user.nextAppointmentDate?.let { dateString ->
                                             val datePart = dateString.take(10)
                                             val date = LocalDate.parse(datePart, DateTimeFormatter.ISO_LOCAL_DATE)
+                                            val spanishFormatter = DateTimeFormatter.ofPattern("MMM", Locale("es", "MX"))
                                             val monthName =
-                                                date.month
-                                                    .getDisplayName(
-                                                        java.time.format.TextStyle.SHORT,
-                                                        Locale("es", "MX"),
-                                                    ).uppercase()
+                                                date
+                                                    .format(spanishFormatter)
+                                                    .uppercase()
                                                     .replace(".", "")
                                             val dayOfMonth = date.dayOfMonth.toString().padStart(2, '0')
                                             AppointmentCard(
