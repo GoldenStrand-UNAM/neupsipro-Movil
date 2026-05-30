@@ -18,7 +18,8 @@
         <activity
             android:name="com.example.neupsipromovil.presentation.MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.NeupsiproMovil">
+            android:theme="@style/Theme.NeupsiproMovil"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
