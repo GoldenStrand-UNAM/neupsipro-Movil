@@ -26,6 +26,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
@@ -54,6 +55,7 @@ import com.example.neupsipromovil.presentation.common.organisms.LogoutConfirmati
 import com.example.neupsipromovil.presentation.common.organisms.MainAppBottomBar
 import com.example.neupsipromovil.presentation.common.organisms.StaffMemberCard
 import com.example.neupsipromovil.presentation.navegation.Screen
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ly.com.tahaben.showcase_layout_compose.model.Gravity
 import ly.com.tahaben.showcase_layout_compose.model.ShowcaseMsg
@@ -75,6 +77,7 @@ fun ProfileScreen(
     var isShowcasing by remember { mutableStateOf(false) }
     val lazyListState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
+    var isRefreshing by remember { mutableStateOf(false) }
 
     LaunchedEffect(isShowcasing) {
         if (isShowcasing) {
@@ -96,223 +99,236 @@ fun ProfileScreen(
 
     val statusBarPadding = WindowInsets.statusBars.asPaddingValues()
 
-    Scaffold(
-        floatingActionButton = {
-            AccessibilityButton(onClick = {
-                Toast.makeText(context, "Funcionalidad por implementar", Toast.LENGTH_SHORT).show()
-            })
+    PullToRefreshBox(
+        isRefreshing = isRefreshing,
+        onRefresh = {
+            coroutineScope.launch {
+                isRefreshing = true
+                viewModel.getProfile(userId)
+                delay(1500)
+                isRefreshing = false
+            }
         },
-        bottomBar = {
-            MainAppBottomBar(
-                currentScreen = "perfil",
-                onNavigate = { screen ->
-                    if (screen == "foro") {
-                        navController.navigate(Screen.Forum.createRoute(userId)) {
-                            popUpTo(navController.graph.startDestinationId) { saveState = true }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                    }
-                },
-            )
-        },
-    ) { paddingValues ->
-        ShowcaseLayout(
-            isShowcasing = isShowcasing,
-            onFinish = {
-                isShowcasing = false
-                coroutineScope.launch { lazyListState.scrollToItem(0) }
+        modifier = Modifier.fillMaxSize(),
+    ) {
+        Scaffold(
+            floatingActionButton = {
+                AccessibilityButton(onClick = {
+                    Toast.makeText(context, "Funcionalidad por implementar", Toast.LENGTH_SHORT).show()
+                })
             },
-            greeting =
-                ShowcaseMsg(
-                    text = "Bienvenido a tu perfil. Presiona en cualquier lado para iniciar el recorrido.",
-                    textStyle = TextStyle(color = Color.White),
-                ),
-        ) {
-            Box(
-                modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
-                        .background(Color(0xFFF5F5F5)),
+            bottomBar = {
+                MainAppBottomBar(
+                    currentScreen = "perfil",
+                    onNavigate = { screen ->
+                        if (screen == "foro") {
+                            navController.navigate(Screen.Forum.createRoute(userId)) {
+                                popUpTo(navController.graph.startDestinationId) { saveState = true }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        }
+                    },
+                )
+            },
+        ) { paddingValues ->
+            ShowcaseLayout(
+                isShowcasing = isShowcasing,
+                onFinish = {
+                    isShowcasing = false
+                    coroutineScope.launch { lazyListState.scrollToItem(0) }
+                },
+                greeting =
+                    ShowcaseMsg(
+                        text = "Bienvenido a tu perfil. Presiona en cualquier lado para iniciar el recorrido.",
+                        textStyle = TextStyle(color = Color.White),
+                    ),
             ) {
-                when {
-                    state.isLoading -> {
-                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                    }
+                Box(
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues)
+                            .background(Color(0xFFF5F5F5)),
+                ) {
+                    when {
+                        state.isLoading -> {
+                            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                        }
 
-                    state.error != null -> {
-                        Text(
-                            text = "Error: ${state.error}",
-                            modifier = Modifier.align(Alignment.Center),
-                            color = Color.Red,
-                        )
-                    }
+                        state.error != null -> {
+                            Text(
+                                text = "Error: ${state.error}",
+                                modifier = Modifier.align(Alignment.Center),
+                                color = Color.Red,
+                            )
+                        }
 
-                    state.user != null -> {
-                        val user = state.user!!
-                        val hasAppointment = user.nextAppointmentDate != null
-                        val appointmentIndex = if (hasAppointment) 2 else -1
-                        val staffIndex = if (hasAppointment) 3 else 2
+                        state.user != null -> {
+                            val user = state.user!!
+                            val hasAppointment = user.nextAppointmentDate != null
+                            val appointmentIndex = if (hasAppointment) 2 else -1
+                            val staffIndex = if (hasAppointment) 3 else 2
 
-                        val translatedStage =
-                            when (user.stage?.lowercase(Locale.ROOT)) {
-                                "evaluation" -> "Evaluación"
-                                "intervention" -> "Intervención"
-                                "graduation" -> "Graduación"
-                                null -> ""
-                                else -> user.stage
-                            }
-
-                        LazyColumn(
-                            state = lazyListState,
-                            modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(bottom = 24.dp),
-                        ) {
-                            item {
-                                Box(
-                                    modifier =
-                                        Modifier
-                                            .fillMaxWidth()
-                                            .background(
-                                                color = Color(0xFF3F50B4),
-                                                shape = RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp),
-                                            ).padding(top = statusBarPadding.calculateTopPadding())
-                                            .padding(horizontal = 16.dp, vertical = 24.dp),
-                                ) {
-                                    ProfileHeader(
-                                        fullName = user.fullName,
-                                        image = user.profilePhoto,
-                                        stage = translatedStage,
-                                    )
-                                    Row(
-                                        modifier =
-                                            Modifier
-                                                .align(Alignment.TopEnd)
-                                                .padding(top = 0.dp, end = 4.dp),
-                                        horizontalArrangement = Arrangement.spacedBy(16.dp),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                    ) {
-                                        HeaderIconButton(
-                                            icon = Icons.AutoMirrored.Filled.HelpOutline,
-                                            contentDescription = "Ayuda",
-                                            onClick = { isShowcasing = true },
-                                        )
-                                        HeaderIconButton(
-                                            icon = Icons.AutoMirrored.Filled.ExitToApp,
-                                            contentDescription = "Cerrar sesión",
-                                            onClick = { showLogoutModal = true },
-                                        )
-                                    }
+                            val translatedStage =
+                                when (user.stage?.lowercase(Locale.ROOT)) {
+                                    "evaluation" -> "Evaluación"
+                                    "intervention" -> "Intervención"
+                                    "graduation" -> "Graduación"
+                                    null -> ""
+                                    else -> user.stage
                                 }
-                            }
-                            item {
-                                Column(
-                                    modifier =
-                                        Modifier
-                                            .fillMaxWidth()
-                                            .padding(horizontal = 16.dp),
-                                ) {
-                                    Spacer(modifier = Modifier.height(16.dp))
 
-                                    ClinicalInfoCard(
-                                        age = user.age,
-                                        unitEntryDate = user.registrationDate,
-                                        neuroEntryDate = user.neuroEntryDate,
-                                        modifier =
-                                            Modifier.showcase(
-                                                index = 1,
-                                                message =
-                                                    ShowcaseMsg(
-                                                        text = "Aquí puedes revisar tu información clínica registrada.",
-                                                        textStyle = TextStyle(color = Color.White),
-                                                        gravity = Gravity.Bottom,
-                                                    ),
-                                            ),
-                                    )
-
-                                    Spacer(modifier = Modifier.height(24.dp))
-
-                                    Text(
-                                        text = "Próximas citas",
-                                        style = MaterialTheme.typography.titleMedium,
-                                        modifier = Modifier.padding(bottom = 8.dp),
-                                    )
-                                    if (hasAppointment) {
-                                        user.nextAppointmentDate?.let { dateString ->
-                                            val datePart = dateString.take(10)
-                                            val date = LocalDate.parse(datePart, DateTimeFormatter.ISO_LOCAL_DATE)
-                                            val spanishFormatter = DateTimeFormatter.ofPattern("MMM", Locale("es", "MX"))
-                                            val monthName =
-                                                date
-                                                    .format(spanishFormatter)
-                                                    .uppercase()
-                                                    .replace(".", "")
-                                            val dayOfMonth = date.dayOfMonth.toString().padStart(2, '0')
-                                            AppointmentCard(
-                                                month = monthName,
-                                                day = dayOfMonth,
-                                                title = "Cita proxima",
-                                                time = user.nextAppointmentTime?.take(5) ?: "--:--",
-                                                modifier =
-                                                    Modifier.showcase(
-                                                        index = appointmentIndex,
-                                                        message =
-                                                            ShowcaseMsg(
-                                                                text = "Esta es la fecha y hora de tu siguiente cita agendada.",
-                                                                textStyle = TextStyle(color = Color.White),
-                                                                gravity = Gravity.Top,
-                                                            ),
-                                                    ),
-                                            )
-                                        }
-                                    } else {
-                                        Text(
-                                            text = "No tienes citas programadas.",
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            color = Color.Gray,
-                                            modifier = Modifier.padding(vertical = 8.dp),
-                                        )
-                                    }
-
-                                    Spacer(modifier = Modifier.height(24.dp))
-
+                            LazyColumn(
+                                state = lazyListState,
+                                modifier = Modifier.fillMaxSize(),
+                                contentPadding = PaddingValues(bottom = 24.dp),
+                            ) {
+                                item {
                                     Box(
                                         modifier =
-                                            Modifier.showcase(
-                                                index = staffIndex,
-                                                message =
-                                                    ShowcaseMsg(
-                                                        text = "Aquí encuentras los especialistas asignados a tu caso.",
-                                                        textStyle = TextStyle(color = Color.White),
-                                                        gravity = Gravity.Top,
-                                                    ),
-                                            ),
+                                            Modifier
+                                                .fillMaxWidth()
+                                                .background(
+                                                    color = Color(0xFF3F50B4),
+                                                    shape = RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp),
+                                                ).padding(top = statusBarPadding.calculateTopPadding())
+                                                .padding(horizontal = 16.dp, vertical = 24.dp),
                                     ) {
-                                        Column {
-                                            StaffMemberCard(roleTitle = "Psicólogo", staffName = user.assignedClinic)
-                                            Spacer(modifier = Modifier.height(16.dp))
-                                            StaffMemberCard(roleTitle = "Prostesista", staffName = user.prosthetist)
+                                        ProfileHeader(
+                                            fullName = user.fullName,
+                                            image = user.profilePhoto,
+                                            stage = translatedStage,
+                                        )
+                                        Row(
+                                            modifier =
+                                                Modifier
+                                                    .align(Alignment.TopEnd)
+                                                    .padding(top = 0.dp, end = 4.dp),
+                                            horizontalArrangement = Arrangement.spacedBy(16.dp),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                        ) {
+                                            HeaderIconButton(
+                                                icon = Icons.AutoMirrored.Filled.HelpOutline,
+                                                contentDescription = "Ayuda",
+                                                onClick = { isShowcasing = true },
+                                            )
+                                            HeaderIconButton(
+                                                icon = Icons.AutoMirrored.Filled.ExitToApp,
+                                                contentDescription = "Cerrar sesión",
+                                                onClick = { showLogoutModal = true },
+                                            )
                                         }
                                     }
-                                    Spacer(modifier = Modifier.height(100.dp))
+                                }
+                                item {
+                                    Column(
+                                        modifier =
+                                            Modifier
+                                                .fillMaxWidth()
+                                                .padding(horizontal = 16.dp),
+                                    ) {
+                                        Spacer(modifier = Modifier.height(16.dp))
+
+                                        ClinicalInfoCard(
+                                            age = user.age,
+                                            unitEntryDate = user.registrationDate,
+                                            neuroEntryDate = user.neuroEntryDate,
+                                            modifier =
+                                                Modifier.showcase(
+                                                    index = 1,
+                                                    message =
+                                                        ShowcaseMsg(
+                                                            text = "Aquí puedes revisar tu información clínica registrada.",
+                                                            textStyle = TextStyle(color = Color.White),
+                                                            gravity = Gravity.Bottom,
+                                                        ),
+                                                ),
+                                        )
+
+                                        Spacer(modifier = Modifier.height(24.dp))
+
+                                        Text(
+                                            text = "Próximas citas",
+                                            style = MaterialTheme.typography.titleMedium,
+                                            modifier = Modifier.padding(bottom = 8.dp),
+                                        )
+                                        if (hasAppointment) {
+                                            user.nextAppointmentDate?.let { dateString ->
+                                                val datePart = dateString.take(10)
+                                                val date = LocalDate.parse(datePart, DateTimeFormatter.ISO_LOCAL_DATE)
+                                                val spanishFormatter = DateTimeFormatter.ofPattern("MMM", Locale("es", "MX"))
+                                                val monthName =
+                                                    date
+                                                        .format(spanishFormatter)
+                                                        .uppercase()
+                                                        .replace(".", "")
+                                                val dayOfMonth = date.dayOfMonth.toString().padStart(2, '0')
+                                                AppointmentCard(
+                                                    month = monthName,
+                                                    day = dayOfMonth,
+                                                    title = "Cita proxima",
+                                                    time = user.nextAppointmentTime?.take(5) ?: "--:--",
+                                                    modifier =
+                                                        Modifier.showcase(
+                                                            index = appointmentIndex,
+                                                            message =
+                                                                ShowcaseMsg(
+                                                                    text = "Esta es la fecha y hora de tu siguiente cita agendada.",
+                                                                    textStyle = TextStyle(color = Color.White),
+                                                                    gravity = Gravity.Top,
+                                                                ),
+                                                        ),
+                                                )
+                                            }
+                                        } else {
+                                            Text(
+                                                text = "No tienes citas programadas.",
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                color = Color.Gray,
+                                                modifier = Modifier.padding(vertical = 8.dp),
+                                            )
+                                        }
+
+                                        Spacer(modifier = Modifier.height(24.dp))
+
+                                        Box(
+                                            modifier =
+                                                Modifier.showcase(
+                                                    index = staffIndex,
+                                                    message =
+                                                        ShowcaseMsg(
+                                                            text = "Aquí encuentras los especialistas asignados a tu caso.",
+                                                            textStyle = TextStyle(color = Color.White),
+                                                            gravity = Gravity.Top,
+                                                        ),
+                                                ),
+                                        ) {
+                                            Column {
+                                                StaffMemberCard(roleTitle = "Psicólogo", staffName = user.assignedClinic)
+                                                Spacer(modifier = Modifier.height(16.dp))
+                                                StaffMemberCard(roleTitle = "Prostesista", staffName = user.prosthetist)
+                                            }
+                                        }
+                                        Spacer(modifier = Modifier.height(100.dp))
+                                    }
                                 }
                             }
                         }
                     }
-                }
-                if (showLogoutModal) {
-                    LogoutConfirmationModal(
-                        onDismiss = { showLogoutModal = false },
-                        onConfirm = {
-                            showLogoutModal = false
-                            viewModel.logout(onSuccessLogout = {
-                                navController.navigate(Screen.Login.route) {
-                                    popUpTo(0) { inclusive = true }
-                                }
-                            })
-                        },
-                    )
+                    if (showLogoutModal) {
+                        LogoutConfirmationModal(
+                            onDismiss = { showLogoutModal = false },
+                            onConfirm = {
+                                showLogoutModal = false
+                                viewModel.logout(onSuccessLogout = {
+                                    navController.navigate(Screen.Login.route) {
+                                        popUpTo(0) { inclusive = true }
+                                    }
+                                })
+                            },
+                        )
+                    }
                 }
             }
         }
