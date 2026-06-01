@@ -90,7 +90,7 @@ fun LoginScreen(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.logo_enes),
+                    painter = painterResource(id = R.drawable.neuropsicologia_blanconegro),
                     contentDescription = "ENES Juriquilla UNAM",
                     modifier = Modifier.size(72.dp),
                 )
