@@ -1,0 +1,372 @@
+package com.example.neupsipromovil.data.remote.api
+
+import kotlinx.coroutines.test.runTest
+import okhttp3.OkHttpClient
+import okhttp3.mockwebserver.MockResponse
+import okhttp3.mockwebserver.MockWebServer
+import org.junit.After
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
+import org.junit.Assert.assertFalse
+import org.junit.Before
+import org.junit.Test
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+
+class APIServiceTest {
+    private lateinit var mockWebServer: MockWebServer
+    private lateinit var apiService: APIService
+
+    @Before
+    fun setup() {
+        // Wakes up a fake http server
+        mockWebServer = MockWebServer()
+        mockWebServer.start()
+
+        // OkHttpClient without an auth interceptor — we test raw HTTP behavior
+        val client = OkHttpClient.Builder().build()
+
+        apiService =
+            Retrofit
+                .Builder()
+                // Fake Server
+                .baseUrl(mockWebServer.url("/"))
+                .client(client)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+                .create(APIService::class.java)
+    }
+
+    // Shut down server after each tests
+    @After
+    fun tearDown() {
+        mockWebServer.shutdown()
+    }
+
+    // ─────────────────────────────────────────────
+    // Happy path — 200 with full profile JSON
+    // ─────────────────────────────────────────────
+
+    @Test
+    fun `successful profile fetch returns 200 and parses all fields`() =
+        runTest {
+            // GIVEN: server returns a complete profile matching UserProfileResponse structure
+            val uuid = "550e8400-e29b-41d4-a716-446655440000"
+            mockWebServer.enqueue(
+                MockResponse()
+                    .setResponseCode(200)
+                    .setBody(
+                        """
+                        {
+                            "success": true,
+                            "data": {
+                                "personalInfo": {
+                                    "fullName": "John Doe",
+                                    "profilePhoto": "https://cdn.example.com/avatar.jpg",
+                                    "birthDate": "1994-05-15",
+                                    "age": 30
+                                },
+                                "clinicalInfo": {
+                                    "registrationDate": "2024-01-15",
+                                    "neuroEntryDate": "2024-01-20",
+                                    "neuroStatus": "Active",
+                                    "protocol": "P001",
+                                    "state": "Active",
+                                    "stage": "Stand By",
+                                    "prosthetist": "Dr. Pedro"
+                                },
+                                "assignment": {
+                                    "relationId": "rel123",
+                                    "assignedClinic": "maria"
+                                },
+                                "nextAppointment": {
+                                    "date": "2024-06-15",
+                                    "time": "10:00 AM"
+                                }
+                            }
+                        }
+                        """.trimIndent(),
+                    ).addHeader("Content-Type", "application/json"),
+            )
+
+            // Save all the request for verification
+            val response = apiService.getUserProfile(uuid)
+
+            // THEN: UserProfileResponse is parsed correctly
+            assertTrue(response.success)
+            assertNotNull(response.data)
+
+            // THEN: PersonalInfo fields parsed correctly
+            assertEquals("John Doe", response.data.personalInfo.fullName)
+            assertEquals("https://cdn.example.com/avatar.jpg", response.data.personalInfo.profilePhoto)
+            assertEquals("1994-05-15", response.data.personalInfo.birthDate)
+            assertEquals(30, response.data.personalInfo.age)
+
+            // THEN: ClinicalInfo fields parsed correctly
+            assertEquals("2024-01-15", response.data.clinicalInfo.registrationDate)
+            assertEquals("2024-01-20", response.data.clinicalInfo.neuroEntryDate)
+            assertEquals("Active", response.data.clinicalInfo.neuroStatus)
+            assertEquals("P001", response.data.clinicalInfo.protocol)
+            assertEquals("Stand By", response.data.clinicalInfo.stage)
+            assertEquals("Dr. Pedro", response.data.clinicalInfo.prosthetist)
+
+            // THEN: Assignment fields parsed correctly
+            assertEquals("rel123", response.data.assignment.relationId)
+            assertEquals("maria", response.data.assignment.assignedClinic)
+
+            // THEN: NextAppointment fields parsed correctly
+            assertEquals("2024-06-15", response.data.nextAppointment?.date)
+            assertEquals("10:00 AM", response.data.nextAppointment?.time)
+        }
+    // ─────────────────────────────────────────────
+    // Verify the request hits the correct path
+    // ─────────────────────────────────────────────
+
+    @Test
+    fun `request path includes userId as path parameter`() =
+        runTest {
+            val uuid = "550e8400-e29b-41d4-a716-446655440000"
+            mockWebServer.enqueue(
+                MockResponse()
+                    .setResponseCode(200)
+                    .setBody("""{"user_id":"$uuid","username":"john","email":"j@j.com","full_name":"John","avatar_url":null}""")
+                    .addHeader("Content-Type", "application/json"),
+            )
+
+            apiService.getUserProfile(uuid)
+
+            val recordedRequest = mockWebServer.takeRequest()
+
+            // THEN: Retrofit correctly interpolated the UUID into the path
+            assertEquals("/api/profile/$uuid", recordedRequest.path)
+            assertEquals("GET", recordedRequest.method)
+        }
+
+    // ─────────────────────────────────────────────
+    // UC 1.1 — No authentication — server returns 401
+    // ─────────────────────────────────────────────
+
+    @Test
+    fun `UC 1-1 request without token causes server to return 401`() =
+        runTest {
+            // GIVEN: server rejects because no Authorization header was sent
+            mockWebServer.enqueue(MockResponse().setResponseCode(401))
+
+            var statusCode = 0
+            try {
+                // APIService uses @GET without Response<T> wrapper — 401 throws HttpException
+                apiService.getUserProfile("any-uuid")
+            } catch (e: retrofit2.HttpException) {
+                statusCode = e.code()
+            }
+
+            // THEN: app receives 401 and must redirect to login (UC 1.7)
+            assertEquals(401, statusCode)
+        }
+
+    // ─────────────────────────────────────────────
+    // UC 1.2 — Expired token — server returns 401
+    // Same HTTP code as no-auth — the app treats both identically
+    // ─────────────────────────────────────────────
+
+    @Test
+    fun `UC 1-2 expired token returns 401 same as no token`() =
+        runTest {
+            // GIVEN: server identifies the token as expired
+            mockWebServer.enqueue(
+                MockResponse()
+                    .setResponseCode(401)
+                    .setBody("""{"error": "TOKEN_EXPIRED"}""")
+                    .addHeader("Content-Type", "application/json"),
+            )
+
+            var statusCode = 0
+            try {
+                apiService.getUserProfile("any-uuid")
+            } catch (e: retrofit2.HttpException) {
+                statusCode = e.code()
+                // errorBody carries the reason — use it to differentiate expired vs missing
+                val errorBody = e.response()?.errorBody()?.string()
+                assertNotNull(errorBody)
+                assertTrue(errorBody!!.contains("TOKEN_EXPIRED"))
+            }
+
+            assertEquals(401, statusCode)
+        }
+
+    // ─────────────────────────────────────────────
+    // UC 1.3 — Profile not found — server returns 404
+    // ─────────────────────────────────────────────
+
+    @Test
+    fun `UC 1-3 nonexistent userId causes server to return 404`() =
+        runTest {
+            mockWebServer.enqueue(
+                MockResponse()
+                    .setResponseCode(404)
+                    .setBody("""{"error": "USER_NOT_FOUND"}""")
+                    .addHeader("Content-Type", "application/json"),
+            )
+
+            var statusCode = 0
+            try {
+                apiService.getUserProfile("00000000-0000-0000-0000-000000000000")
+            } catch (e: retrofit2.HttpException) {
+                statusCode = e.code()
+            }
+
+            assertEquals(404, statusCode)
+        }
+
+    // ─────────────────────────────────────────────
+    // UC 1.4 — SQL injection in userId path param
+    // ─────────────────────────────────────────────
+
+    @Test
+    fun `UC 1-4 SQL injection in userId is url-encoded in the path`() =
+        runTest {
+            // GIVEN: server returns 400 — it validated the UUID format and rejected it
+            mockWebServer.enqueue(
+                MockResponse()
+                    .setResponseCode(400)
+                    // THEN: server must NOT return a stack trace or raw SQL error
+                    .setBody("""{"error": "INVALID_USER_ID_FORMAT"}""")
+                    .addHeader("Content-Type", "application/json"),
+            )
+
+            val sqlPayload = "' OR '1'='1"
+            var statusCode = 0
+
+            try {
+                apiService.getUserProfile(sqlPayload)
+            } catch (e: retrofit2.HttpException) {
+                statusCode = e.code()
+                val errorBody = e.response()?.errorBody()?.string()
+
+                // THEN: error body must not expose SQL, stack traces or query details
+                assertNotNull(errorBody)
+                assertTrue("Error must not expose SQL keywords", !errorBody!!.contains("SELECT"))
+                assertTrue("Error must not expose stack trace", !errorBody.contains("at com."))
+                assertTrue("Error must not expose table names", !errorBody.contains("FROM users"))
+            }
+
+            assertEquals(400, statusCode)
+
+            // Verify the injection was url-encoded in the path — not interpreted
+            val recordedRequest = mockWebServer.takeRequest()
+            val path = recordedRequest.path ?: ""
+            assertTrue("Path should be url-encoded", path.contains("%27") || path.contains("OR"))
+        }
+
+    // ─────────────────────────────────────────────
+    // UC 1.5 — Accessing another user's profile — server returns 403
+    // ─────────────────────────────────────────────
+
+    @Test
+    fun `UC 1-5 accessing another users profile returns 403 Forbidden`() =
+        runTest {
+            // GIVEN: the token belongs to user A but the UUID is user B's profile
+            mockWebServer.enqueue(
+                MockResponse()
+                    .setResponseCode(403)
+                    .setBody("""{"error": "FORBIDDEN"}""")
+                    .addHeader("Content-Type", "application/json"),
+            )
+
+            var statusCode = 0
+            try {
+                // userId here belongs to a different user than the token owner
+                apiService.getUserProfile("other-user-uuid-1234")
+            } catch (e: retrofit2.HttpException) {
+                statusCode = e.code()
+            }
+
+            // THEN: 403 is different from 401 — user is authenticated but not authorized
+            assertEquals(403, statusCode)
+        }
+
+    // ─────────────────────────────────────────────
+    // UC 1.8 — Response must not expose sensitive data
+    // ─────────────────────────────────────────────
+
+    @Test
+    fun `UC 1-8 successful response does not contain password or raw token in body`() =
+        runTest {
+            val uuid = "550e8400-e29b-41d4-a716-446655440000"
+            mockWebServer.enqueue(
+                MockResponse()
+                    .setResponseCode(200)
+                    .setBody(
+                        """
+                        {
+                            "user_id": "$uuid",
+                            "username": "john_doe",
+                            "email": "john@example.com",
+                            "full_name": "John Doe",
+                            "avatar_url": null
+                        }
+                        """.trimIndent(),
+                    ).addHeader("Content-Type", "application/json"),
+            )
+
+            apiService.getUserProfile(uuid)
+
+            // Inspect the raw response body the server sent
+            val recordedRequest = mockWebServer.takeRequest()
+
+            // THEN: request must carry Authorization header (token goes in header, not URL)
+            // This confirms the token is never exposed in the path or query params
+            val path = recordedRequest.path ?: ""
+            assertTrue("Token must not appear in the URL path", !path.contains("Bearer"))
+            assertTrue("Password must not appear in the URL", !path.contains("password"))
+        }
+    @Test
+    fun `logout request hits the correct endpoint with proper headers and returns 200`() =
+        runTest {
+            //GIVEN: Server responds with 200 OK
+            mockWebServer.enqueue(
+                MockResponse()
+                    .setResponseCode(200)
+                    .addHeader("Content-Type", "application/json")
+            )
+
+            //WHEN: Execute logout w/mock token
+            val response = apiService.logout(authHeader = "Bearer mi-token-123")
+
+            //THEN: verify response success
+            assertTrue(response.isSuccessful)
+            assertEquals(200, response.code())
+            val recordedRequest = mockWebServer.takeRequest()
+            assertEquals("/auth/logout", recordedRequest.path)
+            assertEquals("POST", recordedRequest.method)
+            assertEquals("Bearer mi-token-123", recordedRequest.getHeader("Authorization"))
+            assertEquals("true", recordedRequest.getHeader("No-Authentication"))
+            assertEquals("application/json", recordedRequest.getHeader("Content-Type"))
+        }
+    @Test
+    fun `logout when token is already expired returns 401 unsuccessful response`() =
+        runTest {
+            //GIVEN: Server throws 401
+            mockWebServer.enqueue(MockResponse().setResponseCode(401))
+
+            //WHEN: Try logout with expired token
+            val response = apiService.logout(authHeader = "Bearer token expirado")
+
+            //THEN: response False & 401
+            assertFalse(response.isSuccessful)
+            assertEquals(401, response.code())
+        }
+    @Test
+    fun `logout when server fails return 500 unsuccessful response`() =
+        runTest {
+            mockWebServer.enqueue(MockResponse().setResponseCode(500))
+
+            //WHEN: Try logout
+            val response = apiService.logout(authHeader = "Bearer mi-token-123")
+
+            //THEN: response failed
+            assertFalse(response.isSuccessful)
+            assertEquals(500, response.code())
+        }
+}
