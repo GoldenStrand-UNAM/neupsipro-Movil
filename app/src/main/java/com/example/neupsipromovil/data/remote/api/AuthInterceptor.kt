@@ -1,48 +1,44 @@
 package com.example.neupsipromovil.data.remote.api
 
 import com.example.neupsipromovil.data.local.AuthManager
+import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Response
 import javax.inject.Inject
 import javax.inject.Singleton
-/*
-* HTTP client that captures outgoing requests
-* to automatically add an authorization token (JWT) to the header.
-*/
+
 
 @Singleton
-class AuthInterceptor
-    @Inject
-    constructor(
-        private val authManager: AuthManager,
-    ) : Interceptor {
-        override fun intercept(chain: Interceptor.Chain): Response {
-            val original = chain.request()
-            // If is a login call doesn't add the bearer
-            val isLoginCall = original.url.encodedPath.contains("/auth/login")
+class AuthInterceptor @Inject constructor(
+    private val authManager: AuthManager,
+) : Interceptor {
 
-            val hasNoAuthHeader = original.header("No-Authentication") != null
+    override fun intercept(chain: Interceptor.Chain): Response {
+        val original = chain.request()
+        val isLoginCall     = original.url.encodedPath.contains("/auth/login")
+        val hasNoAuthHeader = original.header("No-Authentication") != null
 
-            // ask to the response to be a json
-            val builder =
-                original
-                    .newBuilder()
-                    .header("Accept", "application/json")
-                    .removeHeader("No-Authentication")
-
-            // if is any other call adds the bearer header
-            if (!isLoginCall && !hasNoAuthHeader) {
-                authManager.getToken()?.let { token ->
-                    builder.header("Authorization", "Bearer $token")
+        val request = original.newBuilder()
+            .header("Accept", "application/json")
+            .removeHeader("No-Authentication")
+            .apply {
+                if (!isLoginCall && !hasNoAuthHeader) {
+                    authManager.getToken()?.let { token ->
+                        header("Authorization", "Bearer $token")
+                    }
                 }
             }
+            .build()
 
-            val response = chain.proceed(builder.build())
+        android.util.Log.d("AuthInterceptor", "URL: ${request.url}")
+        android.util.Log.d("AuthInterceptor", "Authorization: ${request.header("Authorization")}")
 
-            // if the token is not longer valid
-            if (response.code == 401 && !isLoginCall) {
-                authManager.clearSession()
-            }
-            return response
+        val response = chain.proceed(request)
+
+        if (response.code == 401 && !isLoginCall) {
+            authManager.clearSession()
         }
+
+        return response
     }
+}
