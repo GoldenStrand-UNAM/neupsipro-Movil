@@ -38,6 +38,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -47,31 +49,70 @@ import androidx.navigation.NavHostController
 import com.example.neupsipromovil.presentation.common.organisms.MainAppBottomBar
 import com.example.neupsipromovil.presentation.navegation.Screen
 
-
 private val BackgroundColor = Color(0xFFF5F6FA)
 private val AccentBlue      = Color(0xFF3F51B5)
 private val SurfaceWhite    = Color(0xFFFFFFFF)
 
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ForumScreen(
     navController: NavHostController,
     userId: String,
     viewModel: ForumViewModel = hiltViewModel(),
 ) {
-    val uiState    by viewModel.uiState.collectAsState()
+    val uiState     by viewModel.uiState.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
 
+    ForumScreenContent(
+        uiState             = uiState,
+        searchQuery         = searchQuery,
+        onSearchQueryChange = viewModel::onSearchQueryChange,
+        onRetry             = viewModel::retry,
+        onNavigateToProfile = {
+            navController.navigate(Screen.Profile.createRoute(userId)) {
+                popUpTo(navController.graph.startDestinationId) { saveState = true }
+                launchSingleTop = true
+                restoreState    = true
+            }
+        },
+    )
+}
+
+
+@Composable
+fun ForumScreenContent(
+    viewModel: ForumViewModel,
+) {
+    val uiState     by viewModel.uiState.collectAsState()
+    val searchQuery by viewModel.searchQuery.collectAsState()
+
+    ForumScreenContent(
+        uiState             = uiState,
+        searchQuery         = searchQuery,
+        onSearchQueryChange = viewModel::onSearchQueryChange,
+        onRetry             = viewModel::retry,
+        onNavigateToProfile = { /* no hay navegación en tests */ },
+    )
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ForumScreenContent(
+    uiState: ForumUiState,
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
+    onRetry: () -> Unit,
+    onNavigateToProfile: () -> Unit = {},
+) {
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        text = "Foro",
+                        text       = "Foro",
                         fontWeight = FontWeight.Bold,
-                        fontSize = 22.sp,
-                        color = Color(0xFF1A1A2E),
+                        fontSize   = 22.sp,
+                        color      = Color(0xFF1A1A2E),
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -81,25 +122,22 @@ fun ForumScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { /* TODO: navigate to create post screen */ },
+                onClick        = { /* TODO: navigate to create post screen */ },
                 containerColor = AccentBlue,
-                contentColor = Color.White,
-                shape = CircleShape,
+                contentColor   = Color.White,
+                shape          = CircleShape,
             ) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = "Nueva publicación")
+                Icon(
+                    imageVector        = Icons.Default.Add,
+                    contentDescription = "Nueva publicación",
+                )
             }
         },
         bottomBar = {
             MainAppBottomBar(
                 currentScreen = "foro",
-                onNavigate = { screen ->
-                    if (screen == "perfil") {
-                        navController.navigate(Screen.Profile.createRoute(userId)) {
-                            popUpTo(navController.graph.startDestinationId) { saveState = true }
-                            launchSingleTop = true
-                            restoreState    = true
-                        }
-                    }
+                onNavigate    = { screen ->
+                    if (screen == "perfil") onNavigateToProfile()
                 },
             )
         },
@@ -113,27 +151,27 @@ fun ForumScreen(
         ) {
 
             OutlinedTextField(
-                value = searchQuery,
-                onValueChange = viewModel::onSearchQueryChange,
+                value       = searchQuery,
+                onValueChange = onSearchQueryChange,
                 placeholder = {
                     Text(
-                        text = "Buscar discusiones ...",
-                        color = Color(0xFFAAAAAA),
+                        text     = "Buscar discusiones ...",
+                        color    = Color(0xFFAAAAAA),
                         fontSize = 15.sp,
                     )
                 },
                 leadingIcon = {
                     Icon(
-                        imageVector = Icons.Default.Search,
+                        imageVector        = Icons.Default.Search,
                         contentDescription = "Buscar",
-                        tint = Color(0xFFAAAAAA),
+                        tint               = Color(0xFFAAAAAA),
                     )
                 },
                 singleLine = true,
-                shape = RoundedCornerShape(24.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedBorderColor = Color(0xFFE0E0E0),
-                    focusedBorderColor   = AccentBlue,
+                shape      = RoundedCornerShape(24.dp),
+                colors     = OutlinedTextFieldDefaults.colors(
+                    unfocusedBorderColor    = Color(0xFFE0E0E0),
+                    focusedBorderColor      = AccentBlue,
                     unfocusedContainerColor = SurfaceWhite,
                     focusedContainerColor   = SurfaceWhite,
                 ),
@@ -142,15 +180,14 @@ fun ForumScreen(
                     .padding(horizontal = 16.dp, vertical = 12.dp),
             )
 
-
-            when (val state = uiState) {
+            when (uiState) {
                 is ForumUiState.Loading -> LoadingState()
                 is ForumUiState.Error   -> ErrorState(
-                    message = state.message,
-                    onRetry = viewModel::retry,
+                    message = uiState.message,
+                    onRetry = onRetry,
                 )
                 is ForumUiState.Success -> {
-                    if (state.posts.isEmpty()) {
+                    if (uiState.posts.isEmpty()) {
                         EmptyState(query = searchQuery)
                     } else {
                         LazyColumn(
@@ -158,12 +195,12 @@ fun ForumScreen(
                                 start  = 16.dp,
                                 end    = 16.dp,
                                 top    = 4.dp,
-                                bottom = 88.dp,  // clears FAB + bottom bar
+                                bottom = 88.dp,
                             ),
                             verticalArrangement = Arrangement.spacedBy(12.dp),
                         ) {
                             items(
-                                items = state.posts,
+                                items = uiState.posts,
                                 key   = { it.id },
                             ) { post ->
                                 ForumPostCard(post = post)
@@ -180,34 +217,38 @@ fun ForumScreen(
 @Composable
 private fun LoadingState() {
     Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
+        modifier          = Modifier.fillMaxSize(),
+        contentAlignment  = Alignment.Center,
     ) {
-        CircularProgressIndicator(color = AccentBlue)
+        CircularProgressIndicator(
+            color    = AccentBlue,
+            modifier = Modifier.semantics {
+                contentDescription = "Cargando"   // usado por el UI test
+            },
+        )
     }
 }
-
 
 @Composable
 private fun ErrorState(message: String, onRetry: () -> Unit) {
     Column(
-        modifier = Modifier
+        modifier              = Modifier
             .fillMaxSize()
             .padding(32.dp),
         verticalArrangement   = Arrangement.Center,
         horizontalAlignment   = Alignment.CenterHorizontally,
     ) {
         Box(
-            modifier = Modifier
+            modifier         = Modifier
                 .size(72.dp)
                 .background(Color(0xFFE8EAF6), shape = CircleShape),
             contentAlignment = Alignment.Center,
         ) {
             Icon(
-                imageVector = Icons.Outlined.WifiOff,
+                imageVector        = Icons.Outlined.WifiOff,
                 contentDescription = null,
-                tint   = AccentBlue,
-                modifier = Modifier.size(36.dp),
+                tint               = AccentBlue,
+                modifier           = Modifier.size(36.dp),
             )
         }
 
@@ -241,34 +282,33 @@ private fun ErrorState(message: String, onRetry: () -> Unit) {
     }
 }
 
-
 @Composable
 private fun EmptyState(query: String) {
     Column(
-        modifier = Modifier
+        modifier              = Modifier
             .fillMaxSize()
             .padding(32.dp),
         verticalArrangement   = Arrangement.Center,
         horizontalAlignment   = Alignment.CenterHorizontally,
     ) {
         Box(
-            modifier = Modifier
+            modifier         = Modifier
                 .size(72.dp)
                 .background(Color(0xFFE8EAF6), shape = CircleShape),
             contentAlignment = Alignment.Center,
         ) {
             Icon(
-                imageVector = Icons.Outlined.SentimentDissatisfied,
+                imageVector        = Icons.Outlined.SentimentDissatisfied,
                 contentDescription = null,
-                tint   = AccentBlue,
-                modifier = Modifier.size(36.dp),
+                tint               = AccentBlue,
+                modifier           = Modifier.size(36.dp),
             )
         }
 
         Spacer(modifier = Modifier.height(20.dp))
 
         Text(
-            text = if (query.isBlank()) "No hay publicaciones" else "Sin resultados",
+            text       = if (query.isBlank()) "No hay publicaciones" else "Sin resultados",
             fontSize   = 20.sp,
             fontWeight = FontWeight.Bold,
             color      = Color(0xFF1A1A2E),

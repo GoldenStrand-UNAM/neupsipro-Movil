@@ -18,7 +18,6 @@ class ForumRepository @Inject constructor(
             Log.d("ForumRepository", "HTTP code: ${response.code()}")
             Log.d("ForumRepository", "isSuccessful: ${response.isSuccessful}")
 
-            // Token expirado → limpia sesión, la UI reacciona al Flow
             if (response.code() == 401) {
                 authManager.clearSession()
                 error("SESSION_EXPIRED")

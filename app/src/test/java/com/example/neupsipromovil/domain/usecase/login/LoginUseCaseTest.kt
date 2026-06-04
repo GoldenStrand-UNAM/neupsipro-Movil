@@ -5,7 +5,7 @@ import com.example.neupsipromovil.domain.repository.LoginRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
-import org.junit.jupiter.api.Assertions.*
+import org.junit.Assert.*
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.whenever
 
