@@ -1,5 +1,6 @@
 package com.example.neupsipromovil.presentation.navegation
 
+import CreatePostScreen
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -25,6 +26,10 @@ sealed class Screen(
     object Login : Screen("login")
 
     object Home : Screen("home")
+
+    object CreatePost : Screen("create_post/{userId}") {
+        fun createRoute(userId: String) = "create_post/$userId"
+    }
 
     object Profile : Screen("profile/{userId}") {
         fun createRoute(userId: String) = "profile/$userId"
@@ -133,6 +138,17 @@ fun NeuNavGraph(
                 }
 
             ForumScreen(navController = navController, userId = userId)
+        }
+        composable(
+            route = Screen.CreatePost.route,
+            arguments = listOf(
+                navArgument("userId") {
+                    type = NavType.StringType
+                    defaultValue = "u-016"
+                },
+            ),
+        ) {
+            CreatePostScreen(navController = navController)
         }
     }
 }

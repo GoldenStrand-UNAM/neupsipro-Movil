@@ -3,6 +3,7 @@ package com.example.neupsipromovil
 import com.example.neupsipromovil.domain.model.ForumPage
 import com.example.neupsipromovil.domain.model.ForumPost
 import com.example.neupsipromovil.domain.usecase.forum.GetForumPostsUseCase
+import com.example.neupsipromovil.domain.usecase.login.LogoutUseCase
 import com.example.neupsipromovil.presentation.screens.forum.ForumUiState
 import com.example.neupsipromovil.presentation.screens.forum.ForumViewModel
 import io.mockk.coEvery
@@ -29,6 +30,8 @@ class ForumViewModelTest {
     private lateinit var getForumPostsUseCase: GetForumPostsUseCase
     private lateinit var viewModel: ForumViewModel
 
+    private lateinit var logoutUseCase: LogoutUseCase
+
     private val fakePosts = listOf(
         ForumPost(id = "1", title = "Kotlin es genial", content = "Aprende Kotlin desde cero",
             imageUrl = null, date = "2024-01-01", author = "Ana", avatarUrl = null),
@@ -42,6 +45,7 @@ class ForumViewModelTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         getForumPostsUseCase = mockk()
+        logoutUseCase        = mockk()
     }
 
     @After
@@ -54,7 +58,7 @@ class ForumViewModelTest {
         coEvery { getForumPostsUseCase(any(), any()) } returns
                 Result.success(ForumPage(posts = fakePosts, page = 1, totalPages = 1))
 
-        viewModel = ForumViewModel(getForumPostsUseCase)
+        viewModel = ForumViewModel(getForumPostsUseCase, logoutUseCase)
         advanceUntilIdle()
 
         val state = viewModel.uiState.value
@@ -67,7 +71,7 @@ class ForumViewModelTest {
         coEvery { getForumPostsUseCase(any(), any()) } returns
                 Result.failure(Exception("Sin conexión"))
 
-        viewModel = ForumViewModel(getForumPostsUseCase)
+        viewModel = ForumViewModel(getForumPostsUseCase, logoutUseCase)
         advanceUntilIdle()
 
         val state = viewModel.uiState.value
@@ -80,7 +84,7 @@ class ForumViewModelTest {
         coEvery { getForumPostsUseCase(any(), any()) } returns
                 Result.success(ForumPage(posts = fakePosts, page = 1, totalPages = 1))
 
-        viewModel = ForumViewModel(getForumPostsUseCase)
+        viewModel = ForumViewModel(getForumPostsUseCase, logoutUseCase)
         advanceUntilIdle()
 
         viewModel.onSearchQueryChange("Kotlin")
@@ -95,7 +99,7 @@ class ForumViewModelTest {
         coEvery { getForumPostsUseCase(any(), any()) } returns
                 Result.success(ForumPage(posts = fakePosts, page = 1, totalPages = 1))
 
-        viewModel = ForumViewModel(getForumPostsUseCase)
+        viewModel = ForumViewModel(getForumPostsUseCase, logoutUseCase)
         advanceUntilIdle()
 
         viewModel.onSearchQueryChange("Ana")
@@ -110,7 +114,7 @@ class ForumViewModelTest {
         coEvery { getForumPostsUseCase(any(), any()) } returns
                 Result.success(ForumPage(posts = fakePosts, page = 1, totalPages = 1))
 
-        viewModel = ForumViewModel(getForumPostsUseCase)
+        viewModel = ForumViewModel(getForumPostsUseCase, logoutUseCase)
         advanceUntilIdle()
 
         viewModel.onSearchQueryChange("Kotlin")
@@ -127,7 +131,7 @@ class ForumViewModelTest {
             Result.success(ForumPage(posts = fakePosts, page = 1, totalPages = 1)),
         )
 
-        viewModel = ForumViewModel(getForumPostsUseCase)
+        viewModel = ForumViewModel(getForumPostsUseCase, logoutUseCase)
         advanceUntilIdle()
 
         viewModel.retry()
@@ -143,7 +147,7 @@ class ForumViewModelTest {
         coEvery { getForumPostsUseCase(any(), any()) } returns
                 Result.success(ForumPage(posts = fakePosts, page = 1, totalPages = 1))
 
-        val freshViewModel = ForumViewModel(getForumPostsUseCase)
+        val freshViewModel = ForumViewModel(getForumPostsUseCase, logoutUseCase)
 
         Assert.assertTrue(freshViewModel.uiState.value is ForumUiState.Loading)
     }

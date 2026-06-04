@@ -56,7 +56,6 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-// ── Palette ───────────────────────────────────────────────────────────────────
 private val CardBackground   = Color(0xFFEEF0FB)
 private val AccentBlue       = Color(0xFF3F51B5)
 private val AccentBlueSoft   = Color(0xFFE8EAF6)
@@ -92,7 +91,6 @@ fun ForumPostCard(
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
 
-            // ── Header: avatar + author + date ────────────────────────────
             Row(verticalAlignment = Alignment.CenterVertically) {
                 UserAvatar(avatarUrl = post.avatarUrl, author = post.author)
                 Spacer(modifier = Modifier.width(12.dp))
@@ -115,7 +113,6 @@ fun ForumPostCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // ── Title ─────────────────────────────────────────────────────
             Text(
                 text       = post.title,
                 fontWeight = FontWeight.Bold,
@@ -127,17 +124,15 @@ fun ForumPostCard(
 
             Spacer(modifier = Modifier.height(6.dp))
 
-            // ── Content preview (always visible) ─────────────────────────
             Text(
                 text      = post.content,
                 fontSize  = 14.sp,
                 color     = TextSecondary,
-                maxLines  = if (expanded) Int.MAX_VALUE else 2,
+                maxLines  = if (expanded) Int.MAX_VALUE else 3,
                 overflow  = if (expanded) TextOverflow.Visible else TextOverflow.Ellipsis,
                 lineHeight = 20.sp,
             )
 
-            // ── Expanded section ──────────────────────────────────────────
             AnimatedVisibility(
                 visible = expanded && !post.imageUrl.isNullOrBlank(),
                 enter   = fadeIn(tween(300)) + expandVertically(tween(400)),
@@ -157,39 +152,43 @@ fun ForumPostCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            val hasImage     = !post.imageUrl.isNullOrBlank()
+            val hasLongText  = post.title.length > 60 || post.content.length > 100
 
-            // ── Ver más / Ver menos button ────────────────────────────────
-            HorizontalDivider(color = Color(0xFFDDE0F0), thickness = 1.dp)
+            if (hasImage || hasLongText) {
+                Spacer(modifier = Modifier.height(10.dp))
 
-            Spacer(modifier = Modifier.height(4.dp))
+                HorizontalDivider(color = Color(0xFFDDE0F0), thickness = 1.dp)
 
-            Row(
-                modifier            = Modifier
-                    .fillMaxWidth()
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication        = null,
-                        onClick           = { expanded = !expanded },
-                    ),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment     = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text       = if (expanded) "Ver menos" else "Ver más",
-                    fontSize   = 13.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color      = AccentBlue,
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Icon(
-                    imageVector        = Icons.Default.KeyboardArrowDown,
-                    contentDescription = null,
-                    tint               = AccentBlue,
-                    modifier           = Modifier
-                        .size(18.dp)
-                        .rotate(arrowRotation),
-                )
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication        = null,
+                            onClick           = { expanded = !expanded },
+                        ),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment     = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text       = if (expanded) "Ver menos" else "Ver más",
+                        fontSize   = 13.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color      = AccentBlue,
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Icon(
+                        imageVector        = Icons.Default.KeyboardArrowDown,
+                        contentDescription = null,
+                        tint               = AccentBlue,
+                        modifier           = Modifier
+                            .size(18.dp)
+                            .rotate(arrowRotation),
+                    )
+                }
             }
         }
     }

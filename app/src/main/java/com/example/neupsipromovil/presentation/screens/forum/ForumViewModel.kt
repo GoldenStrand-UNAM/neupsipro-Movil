@@ -1,10 +1,12 @@
 package com.example.neupsipromovil.presentation.screens.forum
 
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.neupsipromovil.domain.model.ForumPost
-import com.example.neupsipromovil.domain.usecase.forum.GetForumPostsUseCase
+import com.example.neupsipromovil.domain.usecase.login.LogoutUseCase
 
+import com.example.neupsipromovil.domain.usecase.forum.GetForumPostsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,6 +23,7 @@ sealed interface ForumUiState {
 @HiltViewModel
 class ForumViewModel @Inject constructor(
     private val getForumPostsUseCase: GetForumPostsUseCase,
+    private val logoutUseCase: LogoutUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<ForumUiState>(ForumUiState.Loading)
@@ -33,6 +36,10 @@ class ForumViewModel @Inject constructor(
 
     init {
         loadPosts()
+    }
+
+    companion object {
+        const val MAX_SEARCH_LENGTH = 100
     }
 
     fun loadPosts(page: Int = 1, limit: Int = 10) {
@@ -52,6 +59,8 @@ class ForumViewModel @Inject constructor(
     }
 
     fun onSearchQueryChange(query: String) {
+        if (query.length > MAX_SEARCH_LENGTH) return
+
         _searchQuery.value = query
         val filtered = if (query.isBlank()) allPosts
         else allPosts.filter { post ->
@@ -60,6 +69,21 @@ class ForumViewModel @Inject constructor(
                     post.author.contains(query, ignoreCase = true)
         }
         _uiState.value = ForumUiState.Success(filtered)
+    }
+
+    fun logout(onSuccessLogout: () -> Unit) {
+        viewModelScope.launch {
+            _uiState.value = ForumUiState.Loading
+            logoutUseCase()
+                .onSuccess {
+                    onSuccessLogout()
+                }
+                .onFailure { exception ->
+                    _uiState.value = ForumUiState.Error(
+                        exception.message ?: "Error al cerrar sesión"
+                    )
+                }
+        }
     }
 
     fun retry() = loadPosts()

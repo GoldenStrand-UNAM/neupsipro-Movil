@@ -18,12 +18,14 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import retrofit2.Response
 import java.io.IOException
+import android.content.Context
 
 class ForumRepositoryTest {
 
     private lateinit var api: ForumApiService
     private lateinit var authManager: AuthManager
     private lateinit var repository: ForumRepository
+    private lateinit var context: Context
 
     // ── DTOs de prueba ────────────────────────────────────────────────────────
     private val fakePosts = listOf(
@@ -61,9 +63,15 @@ class ForumRepositoryTest {
 
     @Before
     fun setUp() {
-        api         = mock()   // Mockito — no tiene el bug de MockK con arm64
+        api = mock()
         authManager = mock()
-        repository  = ForumRepository(api, authManager)
+        context = mock()
+
+        repository = ForumRepository(
+            api,
+            authManager,
+            context
+        )
     }
 
     // ── Tests ─────────────────────────────────────────────────────────────────
