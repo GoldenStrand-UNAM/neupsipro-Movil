@@ -1,5 +1,5 @@
-package com.example.neupsipromovil.di
 
+package com.example.neupsipromovil.di
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.security.crypto.EncryptedSharedPreferences
@@ -7,9 +7,11 @@ import androidx.security.crypto.MasterKey
 import com.example.neupsipromovil.data.local.AuthManager
 import com.example.neupsipromovil.data.remote.api.APIService
 import com.example.neupsipromovil.data.remote.api.AuthInterceptor
+import com.example.neupsipromovil.data.remote.api.ForumApiService
 import com.example.neupsipromovil.data.remote.api.LoginApiService
 import com.example.neupsipromovil.data.repository.LoginRepositoryImpl
 import com.example.neupsipromovil.data.repository.ProfileRepositoryImpl
+import com.example.neupsipromovil.data.repository.ForumRepository
 import com.example.neupsipromovil.domain.repository.LoginRepository
 import com.example.neupsipromovil.domain.repository.ProfileRepository
 import dagger.Module
@@ -21,16 +23,17 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
+import javax.inject.Named
 import javax.inject.Singleton
+
 
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
-    @Suppress("ktlint:standard:property-naming")
-    // host
-    private const val url = "http://banu.com.mx/"
 
-    // Encrypted prefs for storing the JWT
+    private const val URL_MAIN = "http://banu.com.mx/"
+    private const val URL_FORUM = "http://banu.com.mx/"
+
     @Provides
     @Singleton
     fun provideSharedPreferences(
@@ -51,16 +54,14 @@ object AppModule {
         )
     }
 
-    // OkHttp with auth interceptor added in for every request
+    // ── OkHttp compartido con AuthInterceptor (main + forum) ─────────────────
     @Provides
     @Singleton
     fun provideOkHttpClient(authInterceptor: AuthInterceptor): OkHttpClient {
-        val logging =
-            okhttp3.logging.HttpLoggingInterceptor().apply {
-                level = okhttp3.logging.HttpLoggingInterceptor.Level.BODY
-            }
-        return OkHttpClient
-            .Builder()
+        val logging = okhttp3.logging.HttpLoggingInterceptor().apply {
+            level = okhttp3.logging.HttpLoggingInterceptor.Level.BODY
+        }
+        return OkHttpClient.Builder()
             .addInterceptor(logging)
             .addInterceptor(authInterceptor)
             .connectTimeout(30, TimeUnit.SECONDS)
@@ -68,22 +69,33 @@ object AppModule {
             .build()
     }
 
+    // ── Retrofit principal (banu.com.mx) ──────────────────────────────────────
     @Provides
     @Singleton
+    @Named("main")
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit =
-        Retrofit
-            .Builder()
-            .baseUrl(url)
+        Retrofit.Builder()
+            .baseUrl(URL_MAIN)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
-    // Build the LoginApiService implementation from the Retrofit
+    // ── Retrofit foro (localhost:3000) ────────────────────────────────────────
     @Provides
     @Singleton
-    fun provideLoginApiService(retrofit: Retrofit): LoginApiService = retrofit.create(LoginApiService::class.java)
+    @Named("forum")
+    fun provideForumRetrofit(okHttpClient: OkHttpClient): Retrofit =
+        Retrofit.Builder()
+            .baseUrl(URL_FORUM)
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
 
-    // build the LoginRepository to its concrete implementation
+    @Provides
+    @Singleton
+    fun provideLoginApiService(@Named("main") retrofit: Retrofit): LoginApiService =
+        retrofit.create(LoginApiService::class.java)
+
     @Provides
     @Singleton
     fun provideLoginRepository(
@@ -94,9 +106,23 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideApiService(retrofit: Retrofit): APIService = retrofit.create(APIService::class.java)
+    fun provideApiService(@Named("main") retrofit: Retrofit): APIService =
+        retrofit.create(APIService::class.java)
 
     @Provides
     @Singleton
-    fun provideProfileRepository(provideApiService: APIService): ProfileRepository = ProfileRepositoryImpl(provideApiService)
+    fun provideProfileRepository(apiService: APIService): ProfileRepository =
+        ProfileRepositoryImpl(apiService)
+
+    @Provides
+    @Singleton
+    fun provideForumApiService(@Named("forum") retrofit: Retrofit): ForumApiService =
+        retrofit.create(ForumApiService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideForumRepository(
+        forumApiService: ForumApiService,
+        authManager: AuthManager,           // ← agrega esto
+    ): ForumRepository = ForumRepository(forumApiService, authManager)
 }
