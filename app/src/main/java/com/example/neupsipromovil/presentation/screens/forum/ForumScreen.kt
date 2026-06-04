@@ -33,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -47,11 +48,9 @@ import androidx.navigation.NavHostController
 import com.example.neupsipromovil.presentation.common.organisms.MainAppBottomBar
 import com.example.neupsipromovil.presentation.navegation.Screen
 
-
 private val BackgroundColor = Color(0xFFF5F6FA)
 private val AccentBlue      = Color(0xFF3F51B5)
 private val SurfaceWhite    = Color(0xFFFFFFFF)
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,31 +59,45 @@ fun ForumScreen(
     userId: String,
     viewModel: ForumViewModel = hiltViewModel(),
 ) {
-    val uiState    by viewModel.uiState.collectAsState()
+    val uiState     by viewModel.uiState.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
+
+    val postCreated by navController
+        .currentBackStackEntry
+        ?.savedStateHandle
+        ?.getStateFlow("post_created", false)
+        ?.collectAsState()
+        ?: return
+
+    LaunchedEffect(postCreated) {
+        if (postCreated) {
+            viewModel.loadPosts()
+            navController.currentBackStackEntry
+                ?.savedStateHandle
+                ?.set("post_created", false)
+        }
+    }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        text = "Foro",
+                        text       = "Foro",
                         fontWeight = FontWeight.Bold,
-                        fontSize = 22.sp,
-                        color = Color(0xFF1A1A2E),
+                        fontSize   = 22.sp,
+                        color      = Color(0xFF1A1A2E),
                     )
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = SurfaceWhite,
-                ),
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = SurfaceWhite),
             )
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { /* TODO: navigate to create post screen */ },
+                onClick        = { navController.navigate(Screen.CreatePost.createRoute(userId)) },
                 containerColor = AccentBlue,
-                contentColor = Color.White,
-                shape = CircleShape,
+                contentColor   = Color.White,
+                shape          = CircleShape,
             ) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Nueva publicación")
             }
@@ -111,29 +124,20 @@ fun ForumScreen(
                 .fillMaxSize()
                 .padding(paddingValues),
         ) {
-
             OutlinedTextField(
-                value = searchQuery,
+                value         = searchQuery,
                 onValueChange = viewModel::onSearchQueryChange,
-                placeholder = {
-                    Text(
-                        text = "Buscar discusiones ...",
-                        color = Color(0xFFAAAAAA),
-                        fontSize = 15.sp,
-                    )
+                placeholder   = {
+                    Text(text = "Buscar discusiones ...", color = Color(0xFFAAAAAA), fontSize = 15.sp)
                 },
                 leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = "Buscar",
-                        tint = Color(0xFFAAAAAA),
-                    )
+                    Icon(imageVector = Icons.Default.Search, contentDescription = "Buscar", tint = Color(0xFFAAAAAA))
                 },
                 singleLine = true,
-                shape = RoundedCornerShape(24.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedBorderColor = Color(0xFFE0E0E0),
-                    focusedBorderColor   = AccentBlue,
+                shape      = RoundedCornerShape(24.dp),
+                colors     = OutlinedTextFieldDefaults.colors(
+                    unfocusedBorderColor    = Color(0xFFE0E0E0),
+                    focusedBorderColor      = AccentBlue,
                     unfocusedContainerColor = SurfaceWhite,
                     focusedContainerColor   = SurfaceWhite,
                 ),
@@ -142,30 +146,21 @@ fun ForumScreen(
                     .padding(horizontal = 16.dp, vertical = 12.dp),
             )
 
-
             when (val state = uiState) {
-                is ForumUiState.Loading -> LoadingState()
-                is ForumUiState.Error   -> ErrorState(
+                is ForumUiState.Loading -> ForumLoadingState()
+                is ForumUiState.Error   -> ForumErrorState(
                     message = state.message,
                     onRetry = viewModel::retry,
                 )
                 is ForumUiState.Success -> {
                     if (state.posts.isEmpty()) {
-                        EmptyState(query = searchQuery)
+                        ForumEmptyState(query = searchQuery)
                     } else {
                         LazyColumn(
-                            contentPadding = PaddingValues(
-                                start  = 16.dp,
-                                end    = 16.dp,
-                                top    = 4.dp,
-                                bottom = 88.dp,  // clears FAB + bottom bar
-                            ),
+                            contentPadding      = PaddingValues(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 88.dp),
                             verticalArrangement = Arrangement.spacedBy(12.dp),
                         ) {
-                            items(
-                                items = state.posts,
-                                key   = { it.id },
-                            ) { post ->
+                            items(items = state.posts, key = { it.id }) { post ->
                                 ForumPostCard(post = post)
                             }
                         }
@@ -176,111 +171,60 @@ fun ForumScreen(
     }
 }
 
-
 @Composable
-private fun LoadingState() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
-    ) {
+fun ForumLoadingState() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         CircularProgressIndicator(color = AccentBlue)
     }
 }
 
-
 @Composable
-private fun ErrorState(message: String, onRetry: () -> Unit) {
+fun ForumErrorState(message: String, onRetry: () -> Unit) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(32.dp),
+        modifier              = Modifier.fillMaxSize().padding(32.dp),
         verticalArrangement   = Arrangement.Center,
         horizontalAlignment   = Alignment.CenterHorizontally,
     ) {
         Box(
-            modifier = Modifier
-                .size(72.dp)
-                .background(Color(0xFFE8EAF6), shape = CircleShape),
+            modifier         = Modifier.size(72.dp).background(Color(0xFFE8EAF6), shape = CircleShape),
             contentAlignment = Alignment.Center,
         ) {
-            Icon(
-                imageVector = Icons.Outlined.WifiOff,
-                contentDescription = null,
-                tint   = AccentBlue,
-                modifier = Modifier.size(36.dp),
-            )
+            Icon(imageVector = Icons.Outlined.WifiOff, contentDescription = null, tint = AccentBlue, modifier = Modifier.size(36.dp))
         }
-
         Spacer(modifier = Modifier.height(20.dp))
-
-        Text(
-            text       = "Algo salió mal",
-            fontSize   = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color      = Color(0xFF1A1A2E),
-        )
-
+        Text(text = "Algo salió mal", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color(0xFF1A1A2E))
         Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text      = message,
-            fontSize  = 14.sp,
-            color     = Color.Gray,
-            textAlign = TextAlign.Center,
-        )
-
+        Text(text = message, fontSize = 14.sp, color = Color.Gray, textAlign = TextAlign.Center)
         Spacer(modifier = Modifier.height(24.dp))
-
-        Button(
-            onClick = onRetry,
-            colors  = ButtonDefaults.buttonColors(containerColor = AccentBlue),
-            shape   = RoundedCornerShape(12.dp),
-        ) {
+        Button(onClick = onRetry, colors = ButtonDefaults.buttonColors(containerColor = AccentBlue), shape = RoundedCornerShape(12.dp)) {
             Text("Reintentar", color = Color.White)
         }
     }
 }
 
-
 @Composable
-private fun EmptyState(query: String) {
+fun ForumEmptyState(query: String) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(32.dp),
+        modifier              = Modifier.fillMaxSize().padding(32.dp),
         verticalArrangement   = Arrangement.Center,
         horizontalAlignment   = Alignment.CenterHorizontally,
     ) {
         Box(
-            modifier = Modifier
-                .size(72.dp)
-                .background(Color(0xFFE8EAF6), shape = CircleShape),
+            modifier         = Modifier.size(72.dp).background(Color(0xFFE8EAF6), shape = CircleShape),
             contentAlignment = Alignment.Center,
         ) {
-            Icon(
-                imageVector = Icons.Outlined.SentimentDissatisfied,
-                contentDescription = null,
-                tint   = AccentBlue,
-                modifier = Modifier.size(36.dp),
-            )
+            Icon(imageVector = Icons.Outlined.SentimentDissatisfied, contentDescription = null, tint = AccentBlue, modifier = Modifier.size(36.dp))
         }
-
         Spacer(modifier = Modifier.height(20.dp))
-
         Text(
-            text = if (query.isBlank()) "No hay publicaciones" else "Sin resultados",
+            text       = if (query.isBlank()) "No hay publicaciones" else "Sin resultados",
             fontSize   = 20.sp,
             fontWeight = FontWeight.Bold,
             color      = Color(0xFF1A1A2E),
         )
-
         Spacer(modifier = Modifier.height(8.dp))
-
         Text(
-            text = if (query.isBlank())
-                "Sé el primero en publicar algo en el foro."
-            else
-                "No encontramos publicaciones para \"$query\".",
+            text      = if (query.isBlank()) "Sé el primero en publicar algo en el foro." else "No encontramos publicaciones para \"$query\".",
             fontSize  = 14.sp,
             color     = Color.Gray,
             textAlign = TextAlign.Center,

@@ -1,5 +1,6 @@
 
 package com.example.neupsipromovil.di
+
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.security.crypto.EncryptedSharedPreferences
@@ -9,9 +10,9 @@ import com.example.neupsipromovil.data.remote.api.APIService
 import com.example.neupsipromovil.data.remote.api.AuthInterceptor
 import com.example.neupsipromovil.data.remote.api.ForumApiService
 import com.example.neupsipromovil.data.remote.api.LoginApiService
+import com.example.neupsipromovil.data.repository.ForumRepository
 import com.example.neupsipromovil.data.repository.LoginRepositoryImpl
 import com.example.neupsipromovil.data.repository.ProfileRepositoryImpl
-import com.example.neupsipromovil.data.repository.ForumRepository
 import com.example.neupsipromovil.domain.repository.LoginRepository
 import com.example.neupsipromovil.domain.repository.ProfileRepository
 import dagger.Module
@@ -26,12 +27,11 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Named
 import javax.inject.Singleton
 
-
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
-    private const val URL_MAIN = "http://banu.com.mx/"
+    private const val URL_MAIN  = "http://banu.com.mx/"
     private const val URL_FORUM = "http://banu.com.mx/"
 
     @Provides
@@ -39,12 +39,9 @@ object AppModule {
     fun provideSharedPreferences(
         @ApplicationContext context: Context,
     ): SharedPreferences {
-        val masterKey =
-            MasterKey
-                .Builder(context)
-                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-                .build()
-
+        val masterKey = MasterKey.Builder(context)
+            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+            .build()
         return EncryptedSharedPreferences.create(
             context,
             "auth_prefs",
@@ -54,7 +51,6 @@ object AppModule {
         )
     }
 
-    // ── OkHttp compartido con AuthInterceptor (main + forum) ─────────────────
     @Provides
     @Singleton
     fun provideOkHttpClient(authInterceptor: AuthInterceptor): OkHttpClient {
@@ -69,7 +65,6 @@ object AppModule {
             .build()
     }
 
-    // ── Retrofit principal (banu.com.mx) ──────────────────────────────────────
     @Provides
     @Singleton
     @Named("main")
@@ -80,7 +75,6 @@ object AppModule {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
-    // ── Retrofit foro (localhost:3000) ────────────────────────────────────────
     @Provides
     @Singleton
     @Named("forum")
@@ -123,6 +117,7 @@ object AppModule {
     @Singleton
     fun provideForumRepository(
         forumApiService: ForumApiService,
-        authManager: AuthManager,           // ← agrega esto
-    ): ForumRepository = ForumRepository(forumApiService, authManager)
+        authManager: AuthManager,
+        @ApplicationContext context: Context,
+    ): ForumRepository = ForumRepository(forumApiService, authManager, context)
 }
