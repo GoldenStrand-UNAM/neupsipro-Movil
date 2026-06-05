@@ -1,23 +1,19 @@
 package com.example.neupsipromovil.presentation.screens.forum
 
-
 import android.app.Activity
-import androidx.compose.foundation.background
+import android.content.res.Configuration
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -35,6 +31,9 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
@@ -44,9 +43,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -62,6 +62,8 @@ import com.example.neupsipromovil.presentation.navegation.Screen
 import com.example.neupsipromovil.presentation.screens.forum.publiDetail.ForumEmptyState
 import com.example.neupsipromovil.presentation.screens.forum.publiDetail.ForumErrorState
 import com.example.neupsipromovil.presentation.screens.forum.publiDetail.ForumLoadingState
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ly.com.tahaben.showcase_layout_compose.model.Gravity
 import ly.com.tahaben.showcase_layout_compose.model.ShowcaseMsg
@@ -71,6 +73,7 @@ private val BackgroundColor = Color(0xFFF5F6FA)
 private val AccentBlue      = Color(0xFF3F51B5)
 private val SurfaceWhite    = Color(0xFFFFFFFF)
 
+// ── Entrada principal ─────────────────────────────────────────────────────────
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ForumScreen(
@@ -138,6 +141,7 @@ fun ForumScreenContent(viewModel: ForumViewModel) {
     )
 }
 
+// ── Contenido principal ───────────────────────────────────────────────────────
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ForumScreenContent(
@@ -150,11 +154,40 @@ fun ForumScreenContent(
     onNavigateToProfile: () -> Unit = {},
     onLogout: () -> Unit = {},
 ) {
-    // ── Estado local ──────────────────────────────────────────────────────────
     var showLogoutModal by remember { mutableStateOf(false) }
     var isShowcasing    by remember { mutableStateOf(false) }
     val lazyListState   = rememberLazyListState()
     val coroutineScope  = rememberCoroutineScope()
+    var isRefreshing    by remember { mutableStateOf(false) }
+
+    val configuration = LocalConfiguration.current
+    val isLandscape   = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+
+    // En landscape: header+search se ocultan al bajar y reaparecen al subir
+    var headerVisible by remember { mutableStateOf(true) }
+
+    LaunchedEffect(lazyListState, isLandscape) {
+        if (!isLandscape) {
+            headerVisible = true
+            return@LaunchedEffect
+        }
+        var prevIndex  = 0
+        var prevOffset = 0
+        snapshotFlow {
+            lazyListState.firstVisibleItemIndex to lazyListState.firstVisibleItemScrollOffset
+        }
+            .distinctUntilChanged()
+            .collect { (index, offset) ->
+                val scrollingDown = index > prevIndex ||
+                        (index == prevIndex && offset > prevOffset + 8)
+                val scrollingUp   = index < prevIndex ||
+                        (index == prevIndex && offset < prevOffset - 8)
+                if (scrollingDown && headerVisible)  headerVisible = false
+                if (scrollingUp   && !headerVisible) headerVisible = true
+                prevIndex  = index
+                prevOffset = offset
+            }
+    }
 
     LaunchedEffect(isShowcasing) {
         if (isShowcasing) lazyListState.animateScrollToItem(0)
@@ -168,8 +201,6 @@ fun ForumScreenContent(
         }
     }
 
-    val statusBarPadding = WindowInsets.statusBars.asPaddingValues()
-
     ShowcaseLayout(
         isShowcasing = isShowcasing,
         onFinish = {
@@ -181,174 +212,202 @@ fun ForumScreenContent(
             textStyle = TextStyle(color = Color.White),
         ),
     ) {
-        Scaffold(
-            floatingActionButton = {
-                FloatingActionButton(
-                    onClick        = onCreatePost,
-                    containerColor = AccentBlue,
-                    contentColor   = Color.White,
-                    shape          = CircleShape,
-                    modifier       = Modifier.showcase(       // 👈 paso 3 del tutorial agregado
-                        index   = 3,
-                        message = ShowcaseMsg(
-                            text      = "¡Comparte tus ideas! Haz clic aquí para crear una nueva publicación en el foro.",
-                            textStyle = TextStyle(color = Color.White),
-                            gravity   = Gravity.Top,          // Apunta hacia arriba al estar en la esquina inferior
-                        ),
-                    ),
-                ) {
-                    Icon(
-                        imageVector        = Icons.Default.Add,
-                        contentDescription = "Nueva publicación",
-                    )
+        PullToRefreshBox(
+            isRefreshing = isRefreshing,
+            onRefresh    = {
+                coroutineScope.launch {
+                    isRefreshing = true
+                    onRetry()
+                    delay(1500)
+                    isRefreshing = false
                 }
             },
-            bottomBar = {
-                MainAppBottomBar(
-                    currentScreen = "foro",
-                    onNavigate    = { screen ->
-                        if (screen == "perfil") onNavigateToProfile()
-                    },
-                )
-            },
-            containerColor = BackgroundColor,
-        ) { paddingValues ->
-
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-            ) {
+            modifier = Modifier.fillMaxSize(),
+        ) {
+            Scaffold(
+                topBar = {
+                    AnimatedVisibility(
+                        visible = headerVisible,
+                        enter   = expandVertically(),
+                        exit    = shrinkVertically(),
+                    ) {
+                        TopAppBar(
+                            title = {
+                                Text(
+                                    text       = "Foro Neupsi-Pro",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize   = 20.sp,
+                                    color      = Color.White,
+                                )
+                            },
+                            actions = {
+                                HeaderIconButton(
+                                    icon               = Icons.AutoMirrored.Filled.HelpOutline,
+                                    contentDescription = "Ayuda",
+                                    onClick            = { isShowcasing = true },
+                                    modifier           = Modifier
+                                        .size(24.dp)
+                                        .showcase(
+                                            index   = 3,
+                                            message = ShowcaseMsg(
+                                                text      = "¿Necesitas ayuda? Toca aquí para iniciar el recorrido interactivo.",
+                                                textStyle = TextStyle(color = Color.White),
+                                                gravity   = Gravity.Bottom,
+                                            ),
+                                        ),
+                                )
+                                Spacer(modifier = Modifier.width(16.dp))
+                                HeaderIconButton(
+                                    icon               = Icons.AutoMirrored.Filled.ExitToApp,
+                                    contentDescription = "Cerrar sesión",
+                                    onClick            = { showLogoutModal = true },
+                                    modifier           = Modifier.size(24.dp),
+                                )
+                            },
+                            colors = TopAppBarDefaults.topAppBarColors(
+                                containerColor = AccentBlue,
+                            ),
+                        )
+                    }
+                },
+                floatingActionButton = {
+                    FloatingActionButton(
+                        onClick        = onCreatePost,
+                        containerColor = AccentBlue,
+                        contentColor   = Color.White,
+                        shape          = CircleShape,
+                        modifier       = Modifier.showcase(
+                            index   = 4,
+                            message = ShowcaseMsg(
+                                text      = "¡Comparte tus ideas! Haz clic aquí para crear una nueva publicación en el foro.",
+                                textStyle = TextStyle(color = Color.White),
+                                gravity   = Gravity.Top,
+                            ),
+                        ),
+                    ) {
+                        Icon(
+                            imageVector        = Icons.Default.Add,
+                            contentDescription = "Nueva publicación",
+                        )
+                    }
+                },
+                bottomBar = {
+                    MainAppBottomBar(
+                        currentScreen = "foro",
+                        onNavigate    = { screen ->
+                            if (screen == "perfil") onNavigateToProfile()
+                        },
+                    )
+                },
+                containerColor = BackgroundColor,
+            ) { paddingValues ->
 
                 Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .background(color = Color(0xFF3F50B4)),
+                        .fillMaxSize()
+                        .padding(paddingValues),
                 ) {
-                    Spacer(modifier = Modifier.height(statusBarPadding.calculateTopPadding()))
 
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(32.dp)
-                            .offset(y = (-20).dp)              // 👈 empuja hacia arriba a la fuerza
-                            .padding(horizontal = 16.dp),
-                        verticalAlignment     = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween,
+
+                    AnimatedVisibility(
+                        visible = headerVisible,
+                        enter   = expandVertically(),
+                        exit    = shrinkVertically(),
                     ) {
-                        Text(
-                            text       = "Foro Neupsi-Pro",
-                            fontWeight = FontWeight.Bold,
-                            fontSize   = 32.sp,
-                            color      = Color.White,
-                        )
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalAlignment     = Alignment.CenterVertically,
-                        ) {
-                            HeaderIconButton(
-                                icon               = Icons.AutoMirrored.Filled.HelpOutline,
-                                contentDescription = "Ayuda",
-                                onClick            = { isShowcasing = true },
-                                modifier           = Modifier.size(32.dp),
-                            )
-                            HeaderIconButton(
-                                icon               = Icons.AutoMirrored.Filled.ExitToApp,
-                                contentDescription = "Cerrar sesión",
-                                onClick            = { showLogoutModal = true },
-                                modifier           = Modifier.size(32.dp),
-                            )
-                        }
-                    }
-                }
-
-                // ── Buscador ──────────────────────────────────────────────────
-                OutlinedTextField(
-                    value         = searchQuery,
-                    onValueChange = onSearchQueryChange,
-                    placeholder   = {
-                        Text("Buscar discusiones ...", color = Color(0xFFAAAAAA), fontSize = 15.sp)
-                    },
-                    leadingIcon = {
-                        Icon(
-                            imageVector        = Icons.Default.Search,
-                            contentDescription = "Buscar",
-                            tint               = Color(0xFFAAAAAA),
-                        )
-                    },
-                    singleLine = true,
-                    shape      = RoundedCornerShape(24.dp),
-                    colors     = OutlinedTextFieldDefaults.colors(
-                        unfocusedBorderColor    = Color(0xFFE0E0E0),
-                        focusedBorderColor      = AccentBlue,
-                        unfocusedContainerColor = SurfaceWhite,
-                        focusedContainerColor   = SurfaceWhite,
-                    ),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp)
-                        .showcase(                               // 👈 paso 1 del tutorial
-                            index   = 1,
-                            message = ShowcaseMsg(
-                                text      = "Usa el buscador para encontrar publicaciones por tema.",
-                                textStyle = TextStyle(color = Color.White),
-                                gravity   = Gravity.Bottom,
+                        OutlinedTextField(
+                            value         = searchQuery,
+                            onValueChange = onSearchQueryChange,
+                            placeholder   = {
+                                Text(
+                                    text     = "Buscar discusiones...",
+                                    color    = Color(0xFFAAAAAA),
+                                    fontSize = 14.sp,
+                                )
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector        = Icons.Default.Search,
+                                    contentDescription = "Buscar",
+                                    tint               = Color(0xFFAAAAAA),
+                                    modifier           = Modifier.size(18.dp),
+                                )
+                            },
+                            singleLine = true,
+                            shape      = RoundedCornerShape(20.dp),
+                            colors     = OutlinedTextFieldDefaults.colors(
+                                unfocusedBorderColor    = Color(0xFFE0E0E0),
+                                focusedBorderColor      = AccentBlue,
+                                unfocusedContainerColor = SurfaceWhite,
+                                focusedContainerColor   = SurfaceWhite,
                             ),
-                        ),
-                )
-
-                // ── Contenido principal ───────────────────────────────────────
-                when (val state = uiState) {
-                    is ForumUiState.Loading -> ForumLoadingState()
-                    is ForumUiState.Error   -> ForumErrorState(
-                        message = state.message,
-                        onRetry = onRetry,
-                    )
-                    is ForumUiState.Success -> {
-                        if (state.posts.isEmpty()) {
-                            ForumEmptyState(query = searchQuery)
-                        } else {
-                            LazyColumn(
-                                state               = lazyListState,
-                                contentPadding      = PaddingValues(
-                                    start  = 16.dp,
-                                    end    = 16.dp,
-                                    top    = 4.dp,
-                                    bottom = 88.dp,
+                            // Fuente compacta dentro del campo
+                            textStyle = TextStyle(fontSize = 14.sp),
+                            modifier  = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                                .showcase(
+                                    index   = 1,
+                                    message = ShowcaseMsg(
+                                        text      = "Usa el buscador para encontrar publicaciones por tema.",
+                                        textStyle = TextStyle(color = Color.White),
+                                        gravity   = Gravity.Bottom,
+                                    ),
                                 ),
-                                verticalArrangement = Arrangement.spacedBy(12.dp),
-                            ) {
-                                items(items = state.posts, key = { it.id }) { post ->
-                                    ForumPostCard(
-                                        post     = post,
-                                        modifier = if (state.posts.indexOf(post) == 0) {
-                                            Modifier.showcase(  // 👈 paso 2 del tutorial
-                                                index   = 2,
-                                                message = ShowcaseMsg(
-                                                    text      = "Cada tarjeta muestra una publicación del foro. Tócala para ver más.",
-                                                    textStyle = TextStyle(color = Color.White),
-                                                    gravity   = Gravity.Bottom,
-                                                ),
-                                            )
-                                        } else Modifier,
-                                    )
+                        )
+                    }
+
+                    // ── Lista de posts ────────────────────────────────────────────
+                    when (val state = uiState) {
+                        is ForumUiState.Loading -> ForumLoadingState()
+                        is ForumUiState.Error   -> ForumErrorState(
+                            message = state.message,
+                            onRetry = onRetry,
+                        )
+                        is ForumUiState.Success -> {
+                            if (state.posts.isEmpty()) {
+                                ForumEmptyState(query = searchQuery)
+                            } else {
+                                LazyColumn(
+                                    state               = lazyListState,
+                                    contentPadding      = PaddingValues(
+                                        start  = 12.dp,
+                                        end    = 12.dp,
+                                        top    = 6.dp,
+                                        bottom = 88.dp,
+                                    ),
+                                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                                ) {
+                                    items(items = state.posts, key = { it.id }) { post ->
+                                        ForumPostCard(
+                                            post     = post,
+                                            modifier = if (state.posts.indexOf(post) == 0) {
+                                                Modifier.showcase(
+                                                    index   = 2,
+                                                    message = ShowcaseMsg(
+                                                        text      = "Cada tarjeta muestra una publicación del foro. Tócala para ver más.",
+                                                        textStyle = TextStyle(color = Color.White),
+                                                        gravity   = Gravity.Bottom,
+                                                    ),
+                                                )
+                                            } else Modifier,
+                                        )
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
 
-            // ── Modal de cerrar sesión ────────────────────────────────────────
-            if (showLogoutModal) {
-                LogoutConfirmationModal(
-                    onDismiss = { showLogoutModal = false },
-                    onConfirm = {
-                        showLogoutModal = false
-                        onLogout()
-                    },
-                )
+                if (showLogoutModal) {
+                    LogoutConfirmationModal(
+                        onDismiss = { showLogoutModal = false },
+                        onConfirm = {
+                            showLogoutModal = false
+                            onLogout()
+                        },
+                    )
+                }
             }
-        }
+        } // PullToRefreshBox
     }
 }

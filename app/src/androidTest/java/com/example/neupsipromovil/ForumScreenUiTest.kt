@@ -1,6 +1,7 @@
 package com.example.neupsipromovil
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
@@ -123,7 +124,10 @@ class ForumScreenUiTest {
             )
         }
 
-        composeTestRule.onNodeWithText("Buscar discusiones ...").assertIsDisplayed()
+
+        composeTestRule.onNode(hasText("Buscar discusiones...")).performTextInput("test")
+
+
     }
 
     @Test
@@ -140,7 +144,7 @@ class ForumScreenUiTest {
         }
 
         composeTestRule
-            .onNodeWithText("Buscar discusiones ...")
+            .onNodeWithText("Buscar discusiones...")
             .performTextInput("Kotlin")
 
         assert(capturedQuery == "Kotlin") {

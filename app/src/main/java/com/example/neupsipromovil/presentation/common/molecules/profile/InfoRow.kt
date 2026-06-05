@@ -8,17 +8,20 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.neupsipromovil.presentation.common.atoms.InfoLabel
-import com.example.neupsipromovil.presentation.theme.DarkBlue
+import androidx.compose.ui.unit.sp
 
-@Suppress("ktlint:standard:function-naming")
+private val AccentBlue    = Color(0xFF3F51B5)
+private val TextPrimary   = Color(0xFF1A1A2E)
+private val TextSecondary = Color(0xFF6B7280)
+
 @Composable
 fun InfoRow(
     icon: ImageVector,
@@ -27,25 +30,29 @@ fun InfoRow(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
+        modifier          = modifier
+            .fillMaxWidth()
+            .padding(vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
-            imageVector = icon,
+            imageVector        = icon,
             contentDescription = null,
-            modifier = Modifier.size(24.dp),
-            tint = DarkBlue,
+            modifier           = Modifier.size(20.dp),
+            tint               = AccentBlue,
         )
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(12.dp))
         Column {
-            InfoLabel(text = label)
             Text(
-                text = value,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface,
+                text       = label,
+                fontSize   = 11.sp,
+                color      = TextSecondary,
+            )
+            Text(
+                text       = value,
+                fontSize   = 14.sp,
+                fontWeight = FontWeight.Medium,
+                color      = TextPrimary,
             )
         }
     }
